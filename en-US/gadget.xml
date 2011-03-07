@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<gadget>
+  <!-- The name will appear on the Gadget Tile and settings window -->
+  <name>QuakeServers</name>
+  <namespace>[YOUR CUSTOM NAMESPACE]</namespace>
+  <version>1.0.0.0</version>
+  <author name="jvlppm">
+    <info url="www.quake2.com.br/forum/viewforum.php?f=2" />
+    <!-- The logo file will display on the more details window of the Gadget Tile window -->
+    <logo src="logo.png" />
+  </author>
+  <copyright>&#169; 2011</copyright>
+  <!-- The description displays in the Gadget Tile window when the Gadget is selected -->
+  <description>Visualize o status de servidores aq2</description>
+  <icons>
+    <icon height="48" width="48" src="icon.png" />
+  </icons>
+  <hosts>
+    <host name="sidebar">
+      <base type="HTML" apiVersion="1.0.0" src="gadget.html" />
+      <permissions>Full</permissions>
+      <platform minPlatformVersion="1.0" />
+      <defaultImage src="drag.png" />
+    </host>
+  </hosts>
+</gadget>
