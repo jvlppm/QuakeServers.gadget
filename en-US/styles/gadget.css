@@ -1,8 +1,21 @@
 body
 {
-	width: 130px;
-	height: 230px;
 	border: 0px;
 	padding: 0px;
-	margin: 0px; 
+	margin: 0px;
+}
+
+#error
+{
+	position: absolute;
+	left: 5px;
+	right: 5px;
+	top: 5px;
+	bottom: 5px;
+	border: 1px solid #999;
+	color: White;
+	background: #646D7E;
+	font-weight: bold;
+	text-align: center;
+	display: none;
 }
