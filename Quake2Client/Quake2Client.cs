@@ -15,47 +15,15 @@ namespace Quake2Client
 		string Href { get; }
 	}
 
-	internal class ServerInfo
-	{
-		public ServerInfo(string ip)
-		{
-			if (string.IsNullOrEmpty(ip))
-				throw new ArgumentException("Ip cannot be null or empty", "ip");
-			Ip = ip;
-		}
-
-		public string Ip { get; private set; }
-		public string Name
-		{
-			get
-			{
-				if (Settings == null || !Settings.ContainsKey("hostname"))
-					return Ip;
-				return Settings["hostname"];
-			}
-			set
-			{
-				Settings = Settings ?? new Dictionary<string, string>();
-				if(Settings.ContainsKey("hostname"))
-					Settings["hostname"] = value;
-				else
-					Settings.Add("hostname", value);
-			}
-		}
-		public int NumberOfPlayers { get; set; }
-
-		public Dictionary<string, string> Settings { get; set; }
-	}
-
-	internal class AsyncRequest
-	{
-		public ServerInfo Server { get; set; }
-		public UdpClient Socket { get;set; }
-	}
-
 	[ComVisible(true)]
 	public class Quake2Client : IGadgetWrapper
 	{
+		internal class AsyncRequest
+		{
+			public ServerInfo Server { get; set; }
+			public UdpClient Socket { get; set; }
+		}
+
 		public string Href { get { return "main.html"; } }
 
 		List<ServerInfo> ServerList { get; set; }
@@ -72,10 +40,10 @@ namespace Quake2Client
 
 			ServerList = new List<ServerInfo>
 			{
-				new ServerInfo("200.226.133.100:27911") { Name = "FRAG #1" },
-				new ServerInfo("200.177.229.248:27912") { Name = "TERRA #1"},
-				new ServerInfo("200.177.229.248:27913") { Name = "TERRA #2"},
-				//new ServerInfo("127.0.0.1:27910") { Name = "Fake"}
+				//new ServerInfo("200.226.133.100:27911") { Name = "FRAG #1" },
+				//new ServerInfo("200.177.229.248:27912") { Name = "TERRA #1"},
+				//new ServerInfo("200.177.229.248:27913") { Name = "TERRA #2"},
+				new ServerInfo("jvlppm.no-ip.org:27910") { Name = "Fake"}
 			};
 		}
 
@@ -108,7 +76,14 @@ namespace Quake2Client
 				serverInfo.Add(serverKeyValues[i], serverKeyValues[i+1]);
 
 			req.Server.Settings = serverInfo;
-			req.Server.NumberOfPlayers = serverResponse.Length - 3;
+			List<PlayerInfo> players = new List<PlayerInfo>();
+			for (int i = 2; i < serverResponse.Length; i++)
+			{
+				string[] pInfo = serverResponse[i].Split(' ');
+				if(pInfo.Length == 3)
+					players.Add(new PlayerInfo { Name = pInfo[2].Trim('\"'), Frags = pInfo[0], Ping = pInfo[1]});
+			}
+			req.Server.Players = players;
 		}
 	}
 }
