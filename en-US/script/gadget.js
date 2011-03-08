@@ -1,6 +1,3 @@
-var builder;
-var quake2;
-
 // Gadget
 
 function SetupGadget() {
@@ -51,14 +48,41 @@ function updateSize(width, height) {
 
 //
 
+function CheckForUpdates() {
+	updater.Load(dllLocation, "Quake2Client.Quake2Client");
+}
+
+function updateGadget() {
+	if (updater.CanUpdate) {
+		try {
+			var wrapper = updater.Update();
+			var newIframe = $("<iframe scrolling=\"no\" src=\"" + wrapper.Href + "\"></iframe>");
+
+			$("#main").html("");
+			$("#main").append(newIframe);
+			newIframe.get(0).contentWindow.Wrapper = wrapper;
+			newIframe.get(0).contentWindow.CheckForUpdates = CheckForUpdates;
+			newIframe.get(0).contentWindow.ShowError = ShowError;
+		} catch (Exception) {
+			ShowError(Exception);
+		}
+	}
+}
+
+//
+
+var builder;
+var updater;
+
 function SetupWrapper() {
 	builder = new GadgetBuilder();
 	builder.Initialize();
-	quake2 = builder.LoadType("Wrapper.dll", "Wrapper.Quake2Client");
+	updater = builder.LoadType("Wrapper.dll", "Wrapper.GadgetLoader");
 }
 
 function Unregister() {
-	builder.UnloadType(quake2);
+	builder.UnloadType(updater);
+	updater = null;
 	builder.UnregisterGadgetInterop();
 	builder = null;
 }
@@ -68,12 +92,12 @@ function ShowError(message) {
 }
 
 //
+var dllLocation = "D:\\Documents\\Projects\\QuakeServers.gadget\\Quake2Client\\bin\\Debug\\Quake2Client.dll";
 
 $(document).ready(function () {
 	SetupGadget();
 	SetupWrapper();
+	CheckForUpdates();
 
-	$("#main").html(quake2.Id);
-
-	setTimeout(function () { ShowError("Teste"); }, 1000);
+	setInterval(updateGadget, 1000);
 });
