@@ -4,7 +4,16 @@ function UpdateView() {
 	$("#main").html("");
 	var servers = eval(Wrapper.Servers);
 	for (var i = 0; i < servers.length; i++) {
-		$("#main").append("<div>" + servers[i].Name + " -> " + servers[i].NumberOfPlayers + " players</div>");
+
+	    if ((i % 2) == 0) {
+
+	        $("#main").append('<div class="zebra_on">' + servers[i].Name + " -> " + servers[i].NumberOfPlayers +  'players</div>');
+
+	    }else {
+
+	        $("#main").append('<div class="zebra_off">' + servers[i].Name + " -> " + servers[i].NumberOfPlayers + 'players</div>');
+
+        }
 	}
 }
 

@@ -2,6 +2,7 @@
 
 function SetupGadget() {
 	System.Gadget.onDock = dockGadget;
+	System.Gadget.onUndock = undockGadget;
 	SetupError();
 	checkDockState();
 }
