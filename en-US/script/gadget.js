@@ -74,6 +74,7 @@ function updateGadget() {
 			newIframe.get(0).contentWindow.Wrapper = wrapper;
 			newIframe.get(0).contentWindow.CheckForUpdates = CheckForUpdates;
 			newIframe.get(0).contentWindow.ShowError = ShowError;
+			newIframe.get(0).contentWindow.System = System;
 
 			checkDockState();
 		} catch (Exception) {
