@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Json.cs" />
     <Compile Include="Quake2Client.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

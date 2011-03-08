@@ -34,12 +34,16 @@ function updateSize(width, height) {
 	$("body").width(width);
 	$("body").height(height);
 
-	$("div").each(function () {
+	$("*").each(function () {
 		if ($(this).parent().is("body")) {
 			$(this).width(width - $(this).css("left").replace("px", "") - $(this).css("right").replace("px", ""));
 			$(this).height(height - $(this).css("top").replace("px", "") - $(this).css("bottom").replace("px", ""));
 		}
 		else {
+			if ($(this).is("iframe")) {
+				var a = 1 + 1;
+			}
+
 			$(this).width($(this).parent().width() - $(this).css("left").replace("px", "") - $(this).css("right").replace("px", ""));
 			$(this).height($(this).parent().height() - $(this).css("top").replace("px", "") - $(this).css("bottom").replace("px", ""));
 		}
@@ -48,21 +52,28 @@ function updateSize(width, height) {
 
 //
 
+var initialized = false;
+var dllLocation = "D:\\Documents\\Projects\\QuakeServers.gadget\\Quake2Client\\bin\\Debug\\Quake2Client.dll";
+var className = "Quake2Client.Quake2Client";
+
 function CheckForUpdates() {
-	updater.Load(dllLocation, "Quake2Client.Quake2Client");
+	updater.Load(dllLocation, className);
 }
 
 function updateGadget() {
-	if (updater.CanUpdate) {
+	if (updater.CanUpdate || (!initialized && updater.WrapperLoaded)) {
 		try {
+			initialized = true;
 			var wrapper = updater.Update();
-			var newIframe = $("<iframe scrolling=\"no\" src=\"" + wrapper.Href + "\"></iframe>");
+			var newIframe = $("<iframe class=\"docked\" scrolling=\"no\" src=\"" + wrapper.Href + "\"></iframe>");
 
 			$("#main").html("");
 			$("#main").append(newIframe);
 			newIframe.get(0).contentWindow.Wrapper = wrapper;
 			newIframe.get(0).contentWindow.CheckForUpdates = CheckForUpdates;
 			newIframe.get(0).contentWindow.ShowError = ShowError;
+
+			checkDockState();
 		} catch (Exception) {
 			ShowError(Exception);
 		}
@@ -92,7 +103,6 @@ function ShowError(message) {
 }
 
 //
-var dllLocation = "D:\\Documents\\Projects\\QuakeServers.gadget\\Quake2Client\\bin\\Debug\\Quake2Client.dll";
 
 $(document).ready(function () {
 	SetupGadget();

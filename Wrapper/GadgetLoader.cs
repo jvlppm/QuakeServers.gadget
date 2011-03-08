@@ -43,10 +43,12 @@ namespace Wrapper
 		}
 
 		private static byte[] InUseAssembly { get; set; }
-		//public static object Wrapper { get; private set; }
+		private static object InUseWrapper { get; set; }
 
 		private static byte[] LatestAssembly { get; set; }
 		private static object LatestWrapper { get; set; }
+
+		public bool WrapperLoaded { get { return InUseWrapper != null; } }
 
 		#endregion
 
@@ -85,21 +87,19 @@ namespace Wrapper
 
 		public object Update()
 		{
-			object latestWrapper;
-
-			lock (AssemblyLock)
+			if (CanUpdate)
 			{
-				if (!CanUpdate)
-					throw new Exception("No update available");
-
-				CanUpdate = false;
-				InUseAssembly = LatestAssembly;
-				latestWrapper = LatestWrapper;
-				LatestAssembly = null;
-				LatestWrapper = null;
+				lock (AssemblyLock)
+				{
+					CanUpdate = false;
+					InUseAssembly = LatestAssembly;
+					InUseWrapper = LatestWrapper;
+					LatestAssembly = null;
+					LatestWrapper = null;
+				}
 			}
 
-			return latestWrapper;
+			return InUseWrapper;
 		}
 	}
 }
