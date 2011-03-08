@@ -53,10 +53,11 @@ function updateSize(width, height) {
 //
 
 var initialized = false;
-var dllLocation = "D:\\Documents\\Projects\\QuakeServers.gadget\\Quake2Client\\bin\\Debug\\Quake2Client.dll";
+//var dllLocation = "%USERPROFILE%\\AppData\\Local\\Microsoft\\Windows Sidebar\\Gadgets\\QuakeServers.gadget";
 var className = "Quake2Client.Quake2Client";
 
 function CheckForUpdates() {
+	var dllLocation = System.Gadget.path + "\\Quake2Client\\bin\\Debug\\Quake2Client.dll";
 	updater.Load(dllLocation, className);
 }
 
