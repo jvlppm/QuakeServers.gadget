@@ -14,6 +14,12 @@ function UpdateView() {
 	for (var i = 0; i < servers.length; i++) {
 		var currentServer = servers[i];
 		var serverDiv = $("<div>" + servers[i].Name + " -> " + servers[i].NumberOfPlayers + " players</div>");
+
+		if(i % 2)
+			serverDiv.addClass("zebra_off");
+		else
+			serverDiv.addClass("zebra_on");
+
 		$("#main").append(serverDiv);
 		serverDiv.get(0).onclick = function () {
 			showFlyout("serverInfo.html", currentServer);
