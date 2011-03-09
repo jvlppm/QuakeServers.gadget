@@ -81,14 +81,18 @@ function updateGadget() {
 		try {
 			initialized = true;
 			var wrapper = updater.Update();
-			var newIframe = $("<iframe class='docked' scrolling='no' src='main.html'></iframe>");
+			var newIframe = $("<iframe class='docked' scrolling='no' src='main/main.html'></iframe>");
 
 			$("#main").html("");
 			$("#main").append(newIframe);
-			newIframe.get(0).contentWindow.Wrapper = wrapper;
-			newIframe.get(0).contentWindow.CheckForUpdates = CheckForUpdates;
-			newIframe.get(0).contentWindow.ShowError = ShowError;
-			newIframe.get(0).contentWindow.System = System;
+			try {
+				newIframe.get(0).contentWindow.Wrapper = wrapper;
+				newIframe.get(0).contentWindow.CheckForUpdates = CheckForUpdates;
+				newIframe.get(0).contentWindow.ShowError = ShowError;
+				newIframe.get(0).contentWindow.System = System;
+			} catch (Exception) {
+				document.location = document.location;
+			}
 
 			$("#error").hide("fast");
 
