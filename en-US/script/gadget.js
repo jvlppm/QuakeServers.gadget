@@ -59,6 +59,10 @@ function CheckForUpdates() {
 	updater.CheckUpdates(System.Gadget.path);
 }
 
+function CheckForLocalUpdates() {
+	updater.CheckLocalUpdates(System.Gadget.path);
+}
+
 function LimitValue(value, min, max) {
 	if (value < min)
 		return min;
@@ -68,6 +72,7 @@ function LimitValue(value, min, max) {
 }
 
 function updateGadget() {
+	CheckForLocalUpdates();
 	if (updater.CanUpdate || (!initialized && updater.WrapperLoaded)) {
 
 		if (updater.LastUpdateTime)

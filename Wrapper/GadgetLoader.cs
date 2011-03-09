@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -43,9 +42,11 @@ namespace Wrapper
 			get { return _webClient ?? (_webClient = new WebClient()); }
 		}
 
+		private static byte[] InUseDll { get; set; }
 		private static byte[] InUseZip { get; set; }
 		private static object InUseWrapper { get; set; }
 
+		private static byte[] LatestDll { get; set; }
 		private static byte[] LatestZip { get; set; }
 		private static object LatestWrapper { get; set; }
 
@@ -53,52 +54,78 @@ namespace Wrapper
 
 		#endregion
 
+		private static bool LocalUpdate { get; set; }
 		public bool CanUpdate { get; private set; }
 
 		public double LastUpdateTime { get; private set; }
-		private DateTime UpdateStart;
+		private DateTime _updateStart;
+
+		public void CheckLocalUpdates(string gadgetPath)
+		{
+			if(CanUpdate)
+				return;
+
+			string dllPath = gadgetPath + @"\en-US\bin\Quake2Client.dll";
+
+			if (!File.Exists(dllPath))
+			{
+				CanUpdate = false;
+				return;
+			}
+
+			LatestDll = File.ReadAllBytes(dllPath);
+			if (InUseDll != null && !InUseDll.SameAs(LatestDll))
+			{
+				lock (AssemblyLock)
+				{
+					LocalUpdate = true;
+					CanUpdate = true;
+					PreLoadType(LatestDll);
+					LastUpdateTime = 0;
+				}
+			}
+		}
 
 		public void CheckUpdates(string gadgetPath)
 		{
-			UpdateStart = DateTime.Now;
+			if (LocalUpdate)
+				return;
 
-			string zipUrl = @"https://github.com/jvlppm/Bin/raw/master/QuakeServers.gadget.zip";
+			_updateStart = DateTime.Now;
 
-			if (File.Exists(@"D:\Documents\Projects\Old\Bin\QuakeServers.gadget.zip"))
-				zipUrl = @"D:\Documents\Projects\Old\Bin\QuakeServers.gadget.zip";
-
-			string dllPath = gadgetPath + @"\Quake2Client\bin\Quake2Client.dll";
-
-			if (!zipUrl.StartsWith("http"))
+			var wrapperUpdater = new Thread((ThreadStart)delegate
 			{
-				var newZip = File.ReadAllBytes(zipUrl);
-				if (!InUseZip.SameAs(newZip))
-				{
-					ExtractZipTo(zipUrl, gadgetPath, false);
-					LoadType(File.ReadAllBytes(dllPath), "Quake2Client.Quake2Client");
-					InUseZip = newZip;
-					CanUpdate = true;
-					LastUpdateTime = DateTime.Now.Subtract(UpdateStart).TotalSeconds;
-				}
+			    const string zipUrl = @"https://github.com/jvlppm/Bin/raw/master/QuakeServers.gadget";
+			    string dllPath = gadgetPath + @"\en-US\bin\Quake2Client.dll";
+
+			    var newZip = WebClient.DownloadData(zipUrl);
+			    if (!InUseZip.SameAs(newZip))
+			        UpdateLatestVersion(gadgetPath, newZip, dllPath);
+
+			    LastUpdateTime = DateTime.Now.Subtract(_updateStart).TotalSeconds;
+			});
+
+			wrapperUpdater.Start();
+		}
+
+		private void UpdateLatestVersion(string gadgetPath, byte[] newZip, string dllPath)
+		{
+			if (!File.Exists(dllPath))
+			{
+				CanUpdate = false;
+				return;
 			}
-			else
-			{
-				var wrapperUpdater = new Thread((ThreadStart)delegate
-				{
-					const string tempZipFileName = "lastVersion.zip";
-					var newZip = WebClient.DownloadData(zipUrl);
-					if (!InUseZip.SameAs(newZip))
-					{
-						File.WriteAllBytes(tempZipFileName, newZip);
-						ExtractZipTo(tempZipFileName, gadgetPath, true);
-						LoadType(File.ReadAllBytes(dllPath), "Quake2Client.Quake2Client");
-						InUseZip = newZip;
-						CanUpdate = true;
-						LastUpdateTime = DateTime.Now.Subtract(UpdateStart).TotalSeconds;
-					}
-				});
 
-				wrapperUpdater.Start();
+			lock (AssemblyLock)
+			{
+				const string tempZipFileName = "lastVersion.zip";
+
+				File.WriteAllBytes(tempZipFileName, newZip);
+				ExtractZipTo(tempZipFileName, gadgetPath, true);
+				LatestDll = File.ReadAllBytes(dllPath);
+				PreLoadType(LatestDll);
+				LatestZip = newZip;
+				CanUpdate = true;
 			}
 		}
 
@@ -107,13 +134,11 @@ namespace Wrapper
 			Zip.UnZipFiles(zipPath, gadgetPath, null, deleteZip);
 		}
 
-		static void LoadType(byte[] dll, string className)
+		static void PreLoadType(byte[] dll)
 		{
-			lock (AssemblyLock)
-			{
-				var assembly = Assembly.Load(dll);
-				LatestWrapper = Activator.CreateInstance(assembly.GetType(className));
-			}
+			const string className = "Quake2Client.Quake2Client";
+			var assembly = Assembly.Load(dll);
+			LatestWrapper = Activator.CreateInstance(assembly.GetType(className));
 		}
 
 		public object Update()
@@ -124,7 +149,11 @@ namespace Wrapper
 				{
 					CanUpdate = false;
 					InUseWrapper = LatestWrapper;
+					InUseZip = LatestZip;
+					InUseDll = LatestDll;
+					LatestZip = null;
 					LatestWrapper = null;
+					LatestDll = null;
 				}
 			}
 
