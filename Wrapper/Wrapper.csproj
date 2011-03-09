@@ -138,7 +138,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>xcopy /Y /E /I "$(ProjectDir)$(OutDir)*.dll" "$(SolutionDir)en-US\bin\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

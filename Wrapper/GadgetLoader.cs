@@ -90,7 +90,7 @@ namespace Wrapper
 					if (!InUseZip.SameAs(newZip))
 					{
 						File.WriteAllBytes(tempZipFileName, newZip);
-						ExtractZipTo(tempZipFileName, gadgetPath + "\\..", true);
+						ExtractZipTo(tempZipFileName, gadgetPath, true);
 						LoadType(File.ReadAllBytes(dllPath), "Quake2Client.Quake2Client");
 						InUseZip = newZip;
 						CanUpdate = true;

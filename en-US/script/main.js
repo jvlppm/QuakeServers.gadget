@@ -23,8 +23,9 @@ function UpdateView() {
 			serverDiv.addClass("has_players");
 
 		$("#main").append(serverDiv);
+		serverDiv.get(0).object = currentServer;
 		serverDiv.get(0).onclick = function () {
-			showFlyout("serverInfo.html", currentServer);
+			showFlyout("serverInfo.html", this.object);
 		};
 	}
 }
