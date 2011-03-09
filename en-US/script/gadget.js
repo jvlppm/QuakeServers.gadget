@@ -130,6 +130,7 @@ function ShowError(message) {
 //
 
 $(document).ready(function () {
+	document.body.onclick = null;
 	SetupGadget();
 	SetupWrapper();
 	CheckForUpdates();
