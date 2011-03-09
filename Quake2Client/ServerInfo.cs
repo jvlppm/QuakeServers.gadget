@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Quake2Client
 {
-	internal class ServerInfo
+	[ComVisible(true)]
+	public class ServerInfo
 	{
 		public ServerInfo(string ip)
 		{
@@ -19,11 +21,11 @@ namespace Quake2Client
 			{
 				if (Settings == null || !Settings.ContainsKey("hostname"))
 					return Ip;
-				return Settings["hostname"];
+				return Settings["hostname"].ToString();
 			}
 			set
 			{
-				Settings = Settings ?? new Dictionary<string, string>();
+				Settings = Settings ?? new Dictionary<string, object>();
 				if (Settings.ContainsKey("hostname"))
 					Settings["hostname"] = value;
 				else
@@ -33,6 +35,6 @@ namespace Quake2Client
 		public List<PlayerInfo> Players { get; set; }
 		public int NumberOfPlayers { get { return Players == null ? 0 : Players.Count; } }
 
-		public Dictionary<string, string> Settings { get; set; }
+		public Dictionary<string, object> Settings { get; set; }
 	}
 }

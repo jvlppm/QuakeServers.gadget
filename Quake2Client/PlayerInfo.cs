@@ -1,6 +1,6 @@
 ﻿namespace Quake2Client
 {
-	class PlayerInfo
+	public class PlayerInfo
 	{
 		public string Name { get; set; }
 		public string Ping { get; set; }

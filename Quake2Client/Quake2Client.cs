@@ -47,6 +47,19 @@ namespace Quake2Client
 			};
 		}
 
+		public string GetServerInfo(string ip)
+		{
+			ServerInfo serverInfo = ServerList.FirstOrDefault(s => s.Ip == ip);
+
+			if(serverInfo == null)
+			{
+				serverInfo = new ServerInfo(ip);
+				ServerList.Add(serverInfo);
+			}
+
+			return Json.Extract(serverInfo);
+		}
+
 		public void UpdateServers()
 		{
 			foreach (var server in ServerList)
@@ -70,7 +83,7 @@ namespace Quake2Client
 			string serverStrResponse = resp.Aggregate(string.Empty, (current, c) => current + (char) c);
 			string[] serverResponse = serverStrResponse.Substring(4).Split('\n');
 
-			Dictionary<string, string > serverInfo = new Dictionary<string, string>();
+			Dictionary<string, object> serverInfo = new Dictionary<string, object>();
 			var serverKeyValues = serverResponse[1].Split('\\');
 			for (int i = 1; i < serverKeyValues.Length; i+=2)
 				serverInfo.Add(serverKeyValues[i], serverKeyValues[i+1]);

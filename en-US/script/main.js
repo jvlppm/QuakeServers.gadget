@@ -5,6 +5,7 @@ function showFlyout(page, object) {
 	System.Gadget.Flyout.show = true;
 
 	var flyoutWin = System.Gadget.Flyout.document.parentWindow;
+	flyoutWin.Wrapper = Wrapper;
 	flyoutWin.object = object;
 }
 
