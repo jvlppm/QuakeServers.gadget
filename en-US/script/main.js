@@ -1,5 +1,3 @@
-var checkForUpdatesMinutes = 1;
-
 function showFlyout(page, object) {
 	System.Gadget.Flyout.file = page;
 	System.Gadget.Flyout.show = true;
@@ -14,12 +12,15 @@ function UpdateView() {
 	var servers = eval(Wrapper.Servers);
 	for (var i = 0; i < servers.length; i++) {
 		var currentServer = servers[i];
-		var serverDiv = $("<div>" + servers[i].Name + " -> " + servers[i].NumberOfPlayers + " players</div>");
+		var serverDiv = $("<div class='linha_tabela'>" + servers[i].Name + " -> " + servers[i].NumberOfPlayers + " players</div>");
 
 		if(i % 2)
 			serverDiv.addClass("zebra_off");
 		else
 			serverDiv.addClass("zebra_on");
+
+		if (currentServer.NumberOfPlayers > 0)
+			serverDiv.addClass("has_players");
 
 		$("#main").append(serverDiv);
 		serverDiv.get(0).onclick = function () {
@@ -34,8 +35,6 @@ $(document).ready(function () {
 
 	setInterval(UpdateView, 1000);
 	setInterval(function () { Wrapper.UpdateServers(); }, 10000);
-
-	setInterval(CheckForUpdates, checkForUpdatesMinutes * 60 * 1000);
 
 	$("#main > div").each(function () {
 		var serverDiv = $(this);

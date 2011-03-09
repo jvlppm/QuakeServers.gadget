@@ -59,8 +59,20 @@ function CheckForUpdates() {
 	updater.CheckUpdates(System.Gadget.path);
 }
 
+function LimitValue(value, min, max) {
+	if (value < min)
+		return min;
+	if (value > max)
+		return max;
+	return value;
+}
+
 function updateGadget() {
 	if (updater.CanUpdate || (!initialized && updater.WrapperLoaded)) {
+
+		if (updater.LastUpdateTime)
+			setInterval(CheckForUpdates, LimitValue(updater.LastUpdateTime, 0.05, 60) * 60 * 1000);
+
 		try {
 			initialized = true;
 			var wrapper = updater.Update();

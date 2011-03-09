@@ -68,6 +68,11 @@ body
     background: #FFFFFF;
 }
 
+.has_players
+{
+	font-weight: bold;
+}
+
 #main 
 {
     padding: 5px;

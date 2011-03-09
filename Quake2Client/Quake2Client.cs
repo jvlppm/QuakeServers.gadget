@@ -43,10 +43,10 @@ namespace Quake2Client
 
 			ServerList = new List<ServerInfo>
 			{
-				//new ServerInfo("200.226.133.100:27911") { Name = "FRAG #1" },
-				//new ServerInfo("200.177.229.248:27912") { Name = "TERRA #1"},
-				//new ServerInfo("200.177.229.248:27913") { Name = "TERRA #2"},
-				new ServerInfo("jvlppm.no-ip.org:27910") { Name = "Fake"}
+				new ServerInfo("200.226.133.100:27911") { Name = "FRAG #1" },
+				new ServerInfo("200.177.229.248:27912") { Name = "TERRA #1"},
+				new ServerInfo("200.177.229.248:27913") { Name = "TERRA #2"},
+				//new ServerInfo("jvlppm.no-ip.org:27910") { Name = "Fake"}
 			};
 		}
 

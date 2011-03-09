@@ -55,13 +55,18 @@ namespace Wrapper
 
 		public bool CanUpdate { get; private set; }
 
+		public double LastUpdateTime { get; private set; }
+		private DateTime UpdateStart;
+
 		public void CheckUpdates(string gadgetPath)
 		{
-#if DEBUG
-			const string zipUrl = @"D:\Documents\Projects\Old\Bin\QuakeServers.gadget.zip";
-#else
-			const string zipUrl = @"https://github.com/jvlppm/Bin/raw/master/QuakeServers.gadget.zip";
-#endif
+			UpdateStart = DateTime.Now;
+
+			string zipUrl = @"https://github.com/jvlppm/Bin/raw/master/QuakeServers.gadget.zip";
+
+			if (File.Exists(@"D:\Documents\Projects\Old\Bin\QuakeServers.gadget.zip"))
+				zipUrl = @"D:\Documents\Projects\Old\Bin\QuakeServers.gadget.zip";
+
 			string dllPath = gadgetPath + @"\Quake2Client\bin\Quake2Client.dll";
 
 			if (!zipUrl.StartsWith("http"))
@@ -73,6 +78,7 @@ namespace Wrapper
 					LoadType(File.ReadAllBytes(dllPath), "Quake2Client.Quake2Client");
 					InUseZip = newZip;
 					CanUpdate = true;
+					LastUpdateTime = DateTime.Now.Subtract(UpdateStart).TotalSeconds;
 				}
 			}
 			else
@@ -88,6 +94,7 @@ namespace Wrapper
 						LoadType(File.ReadAllBytes(dllPath), "Quake2Client.Quake2Client");
 						InUseZip = newZip;
 						CanUpdate = true;
+						LastUpdateTime = DateTime.Now.Subtract(UpdateStart).TotalSeconds;
 					}
 				});
 
