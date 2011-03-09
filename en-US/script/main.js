@@ -1,4 +1,4 @@
-var checkForUpdatesMinutes = 5;
+var checkForUpdatesMinutes = 1;
 
 function showFlyout(page, object) {
 	System.Gadget.Flyout.file = page;

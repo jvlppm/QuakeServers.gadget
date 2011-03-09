@@ -6,6 +6,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Update;
 
 namespace Wrapper
 {
@@ -42,10 +43,10 @@ namespace Wrapper
 			get { return _webClient ?? (_webClient = new WebClient()); }
 		}
 
-		private static byte[] InUseAssembly { get; set; }
+		private static byte[] InUseZip { get; set; }
 		private static object InUseWrapper { get; set; }
 
-		private static byte[] LatestAssembly { get; set; }
+		private static byte[] LatestZip { get; set; }
 		private static object LatestWrapper { get; set; }
 
 		public bool WrapperLoaded { get { return InUseWrapper != null; } }
@@ -54,34 +55,57 @@ namespace Wrapper
 
 		public bool CanUpdate { get; private set; }
 
-		public void Load(string url, string className)
+		public void CheckUpdates(string gadgetPath)
 		{
-			if (!url.StartsWith("http"))
-				Load(File.ReadAllBytes(url), className);
+#if DEBUG
+			const string zipUrl = @"D:\Documents\Projects\Old\Bin\QuakeServers.gadget.zip";
+#else
+			const string zipUrl = @"https://github.com/jvlppm/Bin/raw/master/QuakeServers.gadget.zip";
+#endif
+			string dllPath = gadgetPath + @"\Quake2Client\bin\Quake2Client.dll";
+
+			if (!zipUrl.StartsWith("http"))
+			{
+				var newZip = File.ReadAllBytes(zipUrl);
+				if (!InUseZip.SameAs(newZip))
+				{
+					ExtractZipTo(zipUrl, gadgetPath + "\\..", false);
+					LoadType(File.ReadAllBytes(dllPath), "Quake2Client.Quake2Client");
+					InUseZip = newZip;
+					CanUpdate = true;
+				}
+			}
 			else
 			{
 				var wrapperUpdater = new Thread((ThreadStart)delegate
 				{
-					var dll = WebClient.DownloadData(url);
-					Load(dll, className);
+					const string tempZipFileName = "lastVersion.zip";
+					var newZip = WebClient.DownloadData(zipUrl);
+					if (!InUseZip.SameAs(newZip))
+					{
+						File.WriteAllBytes(tempZipFileName, newZip);
+						ExtractZipTo(tempZipFileName, gadgetPath + "\\..", true);
+						LoadType(File.ReadAllBytes(dllPath), "Quake2Client.Quake2Client");
+						InUseZip = newZip;
+						CanUpdate = true;
+					}
 				});
 
 				wrapperUpdater.Start();
 			}
 		}
 
-		public void Load(byte[] dll, string className)
+		private static void ExtractZipTo(string zipPath, string gadgetPath, bool deleteZip)
 		{
-			if (dll.SameAs(LatestAssembly) || dll.SameAs(InUseAssembly))
-				return;
+			Zip.UnZipFiles(zipPath, gadgetPath, null, deleteZip);
+		}
 
+		static void LoadType(byte[] dll, string className)
+		{
 			lock (AssemblyLock)
 			{
 				var assembly = Assembly.Load(dll);
-
 				LatestWrapper = Activator.CreateInstance(assembly.GetType(className));
-				LatestAssembly = dll;
-				CanUpdate = true;
 			}
 		}
 
@@ -92,9 +116,7 @@ namespace Wrapper
 				lock (AssemblyLock)
 				{
 					CanUpdate = false;
-					InUseAssembly = LatestAssembly;
 					InUseWrapper = LatestWrapper;
-					LatestAssembly = null;
 					LatestWrapper = null;
 				}
 			}

@@ -54,12 +54,9 @@ function updateSize(width, height) {
 //
 
 var initialized = false;
-//var dllLocation = "%USERPROFILE%\\AppData\\Local\\Microsoft\\Windows Sidebar\\Gadgets\\QuakeServers.gadget";
-var className = "Quake2Client.Quake2Client";
 
 function CheckForUpdates() {
-	var dllLocation = System.Gadget.path + "\\Quake2Client\\bin\\Debug\\Quake2Client.dll";
-	updater.Load(dllLocation, className);
+	updater.CheckUpdates(System.Gadget.path);
 }
 
 function updateGadget() {
@@ -76,8 +73,12 @@ function updateGadget() {
 			newIframe.get(0).contentWindow.ShowError = ShowError;
 			newIframe.get(0).contentWindow.System = System;
 
+			$("#error").hide("fast");
+
 			checkDockState();
 		} catch (Exception) {
+			if (Exception.message)
+				Exception = Exception.message;
 			ShowError(Exception);
 		}
 	}

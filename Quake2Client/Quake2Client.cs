@@ -24,7 +24,10 @@ namespace Quake2Client
 			public UdpClient Socket { get; set; }
 		}
 
-		public string Href { get { return "main.html"; } }
+		public string Href
+		{
+			get { return "main.html"; }
+		}
 
 		List<ServerInfo> ServerList { get; set; }
 
@@ -51,7 +54,7 @@ namespace Quake2Client
 		{
 			ServerInfo serverInfo = ServerList.FirstOrDefault(s => s.Ip == ip);
 
-			if(serverInfo == null)
+			if (serverInfo == null)
 			{
 				serverInfo = new ServerInfo(ip);
 				ServerList.Add(serverInfo);
@@ -80,21 +83,21 @@ namespace Quake2Client
 			IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, 27910);
 
 			byte[] resp = req.Socket.EndReceive(ar, ref serverEP);
-			string serverStrResponse = resp.Aggregate(string.Empty, (current, c) => current + (char) c);
+			string serverStrResponse = resp.Aggregate(string.Empty, (current, c) => current + (char)c);
 			string[] serverResponse = serverStrResponse.Substring(4).Split('\n');
 
 			Dictionary<string, object> serverInfo = new Dictionary<string, object>();
 			var serverKeyValues = serverResponse[1].Split('\\');
-			for (int i = 1; i < serverKeyValues.Length; i+=2)
-				serverInfo.Add(serverKeyValues[i], serverKeyValues[i+1]);
+			for (int i = 1; i < serverKeyValues.Length; i += 2)
+				serverInfo.Add(serverKeyValues[i], serverKeyValues[i + 1]);
 
 			req.Server.Settings = serverInfo;
 			List<PlayerInfo> players = new List<PlayerInfo>();
 			for (int i = 2; i < serverResponse.Length; i++)
 			{
 				string[] pInfo = serverResponse[i].Split(' ');
-				if(pInfo.Length == 3)
-					players.Add(new PlayerInfo { Name = pInfo[2].Trim('\"'), Frags = pInfo[0], Ping = pInfo[1]});
+				if (pInfo.Length == 3)
+					players.Add(new PlayerInfo { Name = pInfo[2].Trim('\"'), Frags = pInfo[0], Ping = pInfo[1] });
 			}
 			req.Server.Players = players;
 		}
