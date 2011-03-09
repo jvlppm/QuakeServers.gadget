@@ -52,7 +52,9 @@
 REM taskkill /t /f /fi "imagename eq sidebar.exe"
 del /s /q "%25TEMP%25\Gadget"
 del /s /q "%25USERPROFILE%25\AppData\Local\Microsoft\Windows Sidebar\Gadgets\QuakeServers.gadget"
-xcopy /Y /E /I "$(SolutionDir)." "%25USERPROFILE%25\AppData\Local\Microsoft\Windows Sidebar\Gadgets\QuakeServers.gadget"</PostBuildEvent>
+
+xcopy /Y /E /I "$(SolutionDir)en-US\*" "%25USERPROFILE%25\AppData\Local\Microsoft\Windows Sidebar\Gadgets\QuakeServers.gadget\en-US"
+xcopy /Y /I "$(SolutionDir)*.png" "%25USERPROFILE%25\AppData\Local\Microsoft\Windows Sidebar\Gadgets\QuakeServers.gadget\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
