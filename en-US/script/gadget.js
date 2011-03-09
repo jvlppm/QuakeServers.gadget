@@ -81,7 +81,7 @@ function updateGadget() {
 		try {
 			initialized = true;
 			var wrapper = updater.Update();
-			var newIframe = $("<iframe class=\"docked\" scrolling=\"no\" src=\"" + wrapper.Href + "\"></iframe>");
+			var newIframe = $("<iframe class='docked' scrolling='no' src='main.html'></iframe>");
 
 			$("#main").html("");
 			$("#main").append(newIframe);
@@ -129,6 +129,7 @@ $(document).ready(function () {
 	SetupGadget();
 	SetupWrapper();
 	CheckForUpdates();
+	updateGadget();
 
 	setInterval(updateGadget, 1000);
 });

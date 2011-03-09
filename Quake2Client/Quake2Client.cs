@@ -7,27 +7,16 @@ using System.Runtime.InteropServices;
 
 namespace Quake2Client
 {
-	/// <summary>
-	/// Dados necessários para atualização de gadget
-	/// </summary>
-	internal interface IGadgetWrapper
-	{
-		string Href { get; }
-	}
-
 	[ComVisible(true)]
-	public class Quake2Client : IGadgetWrapper
+	public class Quake2Client
 	{
-		internal class AsyncRequest
+		#region Nested Members
+		class AsyncRequest
 		{
 			public ServerInfo Server { get; set; }
 			public UdpClient Socket { get; set; }
 		}
-
-		public string Href
-		{
-			get { return "main.html"; }
-		}
+		#endregion
 
 		List<ServerInfo> ServerList { get; set; }
 
@@ -37,8 +26,7 @@ namespace Quake2Client
 		public Quake2Client()
 		{
 			var queryData = new List<byte> { 255, 255, 255, 255 };
-			queryData.AddRange("status".Select(ch => (byte)ch));
-			queryData.Add(10);
+			queryData.AddRange("status\n".Select(ch => (byte)ch));
 			_queryData = queryData.ToArray();
 
 			ServerList = new List<ServerInfo>
@@ -70,7 +58,7 @@ namespace Quake2Client
 				string hostname = server.Ip.Split(':')[0];
 				int port = int.Parse(server.Ip.Split(':')[1]);
 
-				UdpClient socket = new UdpClient(hostname, port);
+				var socket = new UdpClient(hostname, port);
 				socket.Send(_queryData, _queryData.Length);
 
 				socket.BeginReceive(ReceiveServerInfo, new AsyncRequest { Server = server, Socket = socket });
@@ -79,20 +67,20 @@ namespace Quake2Client
 
 		private static void ReceiveServerInfo(IAsyncResult ar)
 		{
-			AsyncRequest req = (AsyncRequest)ar.AsyncState;
-			IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, 27910);
+			var req = (AsyncRequest)ar.AsyncState;
+			var serverEP = new IPEndPoint(IPAddress.Any, 27910);
 
 			byte[] resp = req.Socket.EndReceive(ar, ref serverEP);
 			string serverStrResponse = resp.Aggregate(string.Empty, (current, c) => current + (char)c);
 			string[] serverResponse = serverStrResponse.Substring(4).Split('\n');
 
-			Dictionary<string, object> serverInfo = new Dictionary<string, object>();
+			var serverInfo = new Dictionary<string, object>();
 			var serverKeyValues = serverResponse[1].Split('\\');
 			for (int i = 1; i < serverKeyValues.Length; i += 2)
 				serverInfo.Add(serverKeyValues[i], serverKeyValues[i + 1]);
 
 			req.Server.Settings = serverInfo;
-			List<PlayerInfo> players = new List<PlayerInfo>();
+			var players = new List<PlayerInfo>();
 			for (int i = 2; i < serverResponse.Length; i++)
 			{
 				string[] pInfo = serverResponse[i].Split(' ');

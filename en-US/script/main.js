@@ -36,11 +36,4 @@ $(document).ready(function () {
 
 	setInterval(UpdateView, 1000);
 	setInterval(function () { Wrapper.UpdateServers(); }, 10000);
-
-	$("#main > div").each(function () {
-		var serverDiv = $(this);
-		serverDiv.get(0).onclick = function () {
-
-		};
-	});
 });
