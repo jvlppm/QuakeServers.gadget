@@ -72,6 +72,7 @@ function updateGadget() {
 
 		if (updater.LastUpdateTime)
 			setInterval(CheckForUpdates, LimitValue(updater.LastUpdateTime, 0.05, 60) * 60 * 1000);
+		ShowError(updater.LastUpdateTime);
 
 		try {
 			initialized = true;

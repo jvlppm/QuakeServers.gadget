@@ -74,7 +74,7 @@ namespace Wrapper
 				var newZip = File.ReadAllBytes(zipUrl);
 				if (!InUseZip.SameAs(newZip))
 				{
-					ExtractZipTo(zipUrl, gadgetPath + "\\..", false);
+					ExtractZipTo(zipUrl, gadgetPath, false);
 					LoadType(File.ReadAllBytes(dllPath), "Quake2Client.Quake2Client");
 					InUseZip = newZip;
 					CanUpdate = true;

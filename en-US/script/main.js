@@ -12,7 +12,7 @@ function UpdateView() {
 	var servers = eval(Wrapper.Servers);
 	for (var i = 0; i < servers.length; i++) {
 		var currentServer = servers[i];
-		var serverDiv = $("<div class='linha_tabela'>" + servers[i].Name + " -> " + servers[i].NumberOfPlayers + " players</div>");
+		var serverDiv = $("<div class='linha_tabela'><div class='server_name'>" + servers[i].Name + "</div><div class='server_info'>" + servers[i].NumberOfPlayers + " players</div></div>");
 
 		if(i % 2)
 			serverDiv.addClass("zebra_off");
