@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Quake2;
 using Quake2.Client;
+using Quake2.Network.Commands.Server;
 
 namespace Quake2Client
 {
@@ -12,9 +13,13 @@ namespace Quake2Client
 		public ServerInfo(string ip)
 		{
 			_q2Client = new Q2Client();
+			_q2Client.UserVars["User"].SetMember("Name", "WindowsGadget");
 
 			_q2Client.OnServerPrint += (s, e) =>
 			                           	{
+											if(e.Command.Level !=  Print.PrintLevel.Chat || _q2Client.ConnectionStatus != ConnectionStatus.Connected)
+												return;
+
 											if (_lastMessages.Count >= 10)
 												_lastMessages.Dequeue();
 											_lastMessages.Enqueue(e.Command.Message);
@@ -84,6 +89,13 @@ namespace Quake2Client
 				return _q2Client.ConnectionStatus == ConnectionStatus.Connecting ||
 					   _q2Client.ConnectionStatus == ConnectionStatus.Disconnecting;
 			}
+		}
+
+		public void Say(string message)
+		{
+			if(_q2Client.ConnectionStatus != ConnectionStatus.Connected)
+				return;
+			_q2Client.Send("say " + message + "\n");
 		}
 
 		private readonly Queue<string> _lastMessages;

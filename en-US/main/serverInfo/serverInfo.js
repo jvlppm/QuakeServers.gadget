@@ -13,10 +13,12 @@ function updateView() {
 	if (object.UpdatingConnection) {
 		$("#start_chat").hide();
 		$("#end_chat").hide();
+		$("#chat_inp").hide();
 		$("#chat").hide("fast", function () { updatingView = false; });
 	}
 	else {
 		if (object.IsConnected) {
+			$("#chat_inp").show();
 			$("body").animate({ width: 430 }, { complete: function () {
 				$("#start_chat").hide();
 				$("#end_chat").show();
@@ -48,6 +50,11 @@ function updateView() {
 
 $(document).ready(function () {
 	object = Wrapper.GetServerInfo(object.Ip);
+
+	$("#chat_say").get(0).onclick = function () {
+		object.Say($("#chat_input").val());
+		$("#chat_input").val("");
+	};
 
 	if (!object.IsConnected) {
 		$("body").width(220);
