@@ -14,3 +14,17 @@ body
 {
 	color: Gray;
 }
+
+#general_info
+{
+	background: Yellow;
+	float: left;
+	width: 200px;
+}
+
+#chat
+{
+	background: Gray;
+	float: left;
+	width: 200px;
+}
