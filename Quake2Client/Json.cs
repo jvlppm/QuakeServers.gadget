@@ -30,7 +30,7 @@ namespace Quake2Client
 			if (obj is int || obj is Int64 || obj is decimal || obj is double || obj is float)
 				return ((IConvertible)obj).ToString(CultureInfo.InvariantCulture);
 
-			if (obj is string || obj is char)
+			if (obj is string || obj is char || obj is Enum)
 				return "\"" + EncodeString(obj.ToString()) + "\"";
 
 			if (obj is IDictionary<string, object>)

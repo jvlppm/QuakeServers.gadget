@@ -17,15 +17,15 @@ namespace Quake2Client
 
 			_q2Client.OnServerPrint += (s, e) =>
 			                           	{
-											if(e.Command.Level !=  Print.PrintLevel.Chat || _q2Client.ConnectionStatus != ConnectionStatus.Connected)
+											if(_q2Client.ConnectionStatus != ConnectionStatus.Connected)
 												return;
 
 											if (_lastMessages.Count >= 10)
 												_lastMessages.Dequeue();
-											_lastMessages.Enqueue(e.Command.Message);
+											_lastMessages.Enqueue(e.Command);
 			                           	};
 
-			_lastMessages = new Queue<string>();
+			_lastMessages = new Queue<Print>();
 			if (string.IsNullOrEmpty(ip))
 				throw new ArgumentException("Ip cannot be null or empty", "ip");
 			Ip = ip;
@@ -98,7 +98,7 @@ namespace Quake2Client
 			_q2Client.Send("say " + message + "\n");
 		}
 
-		private readonly Queue<string> _lastMessages;
+		private readonly Queue<Print> _lastMessages;
 
 		public string LastMessages { get { return Json.Extract(_lastMessages); } }
 

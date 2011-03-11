@@ -7,8 +7,11 @@ function updateView() {
 	$("#chat_text").html("");
 	var messages;
 	eval("messages = " + object.LastMessages + ";");
-	for (var i = 0; i < messages.length; i++)
-		$("#chat_text").append("<div>" + messages[i] + "</div>");
+	for (var i = 0; i < messages.length; i++) {
+		$("#chat_text").append("<div class='serverprint_" + messages[i].Level + "'>" + messages[i].Message + "</div>");
+	}
+
+	$("#chat_text").animate({ scrollTop: $("#chat_text").attr("scrollHeight") }, 300);
 
 	if (object.UpdatingConnection) {
 		$("#start_chat").hide();

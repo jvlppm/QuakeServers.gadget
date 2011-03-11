@@ -40,3 +40,24 @@ body
 	height:80%;
 	margin-bottom: 4px;
 }
+
+
+.serverprint_Chat
+{
+	color: Blue;
+}
+
+.serverprint_Low
+{
+	color: #ddd;
+}
+
+.serverprint_Medium
+{
+	color: #aaa;
+}
+
+.serverprint_High
+{
+	color: #307D7E;
+}
