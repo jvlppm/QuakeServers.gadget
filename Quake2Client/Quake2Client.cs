@@ -38,7 +38,7 @@ namespace Quake2Client
 			};
 		}
 
-		public string GetServerInfo(string ip)
+		public ServerInfo GetServerInfo(string ip)
 		{
 			ServerInfo serverInfo = ServerList.FirstOrDefault(s => s.Ip == ip);
 
@@ -48,7 +48,7 @@ namespace Quake2Client
 				ServerList.Add(serverInfo);
 			}
 
-			return Json.Extract(serverInfo);
+			return serverInfo;
 		}
 
 		public void UpdateServers()

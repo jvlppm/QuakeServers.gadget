@@ -1,7 +1,7 @@
 body
 {
-	background: #abc;
-	width: 200px;
+	background: #aaa;
+	width: 220px;
 	height: 200px;
 }
 
@@ -17,9 +17,11 @@ body
 
 #general_info
 {
+	margin-right: 10px;
 	background: Yellow;
 	float: left;
 	width: 200px;
+	height: 100%;
 }
 
 #chat
@@ -27,4 +29,18 @@ body
 	background: Gray;
 	float: left;
 	width: 200px;
+	height: 100%;
+}
+
+#info_view
+{
+	height: 80%;
+	margin-bottom: 4px;
+}
+
+#chat_text
+{
+	height:80%;
+	background: Green;
+	margin-bottom: 4px;
 }

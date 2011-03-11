@@ -32,6 +32,19 @@ namespace Quake2Client
 					Settings.Add("hostname", value);
 			}
 		}
+
+		public object GetSetting(string name)
+		{
+			return Settings[name];
+		}
+
+		public string GetPlayers()
+		{
+			return Json.Extract(Players);
+		}
+
+		public bool IsConnected { get; set; }
+
 		public List<PlayerInfo> Players { get; set; }
 		public int NumberOfPlayers { get { return Players == null ? 0 : Players.Count; } }
 
