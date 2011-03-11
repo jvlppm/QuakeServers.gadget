@@ -54,7 +54,7 @@ namespace Quake2.Client
 
 			ServerIP = new IPEndPoint(IPAddress.Any, localPort);
 
-			FlushSendBufferTimer = new Timer((int)Q2Client.UserVars["Net"].GetMember("FlushSendBufferTime"))
+			FlushSendBufferTimer = new Timer((int)((Variable)Q2Client.UserVars["Net"].GetMember("FlushSendBufferTime")).Value)
 			                       	{
 			                       		AutoReset = true
 			                       	};

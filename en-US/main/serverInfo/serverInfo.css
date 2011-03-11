@@ -1,6 +1,5 @@
 body
 {
-	background: #aaa;
 	width: 220px;
 	height: 200px;
 }
@@ -12,13 +11,11 @@ body
 
 #info
 {
-	color: Gray;
 }
 
 #general_info
 {
 	margin-right: 10px;
-	background: Yellow;
 	float: left;
 	width: 200px;
 	height: 100%;
@@ -26,7 +23,6 @@ body
 
 #chat
 {
-	background: Gray;
 	float: left;
 	width: 200px;
 	height: 100%;
@@ -40,7 +36,7 @@ body
 
 #chat_text
 {
+	overflow: auto;
 	height:80%;
-	background: Green;
 	margin-bottom: 4px;
 }

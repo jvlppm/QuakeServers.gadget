@@ -4,21 +4,32 @@ function updateView() {
 	if (updatingView)
 		return;
 	updatingView = true;
+	$("#chat_text").html("");
+	var messages;
+	eval("messages = " + object.LastMessages + ";");
+	for (var i = 0; i < messages.length; i++)
+		$("#chat_text").append("<div>" + messages[i] + "</div>");
 
-	if (object.IsConnected) {
-		$("body").animate({ width: 430 }, { complete: function () {
-			$("#start_chat").hide();
-			$("#end_chat").show();
-			$("#chat").show("fast", function () { updatingView = false; });
-		}
-		});
+	if (object.UpdatingConnection) {
+		$("#start_chat").hide();
+		$("#end_chat").hide();
+		$("#chat").hide("fast", function () { updatingView = false; });
 	}
 	else {
-		$("#chat").hide("fast", function () {
-			$("#start_chat").show();
-			$("#end_chat").hide();
-			$("body").animate({ width: 220 }, { complete: function () { updatingView = false; } });
-		});
+		if (object.IsConnected) {
+			$("body").animate({ width: 430 }, { complete: function () {
+				$("#start_chat").hide();
+				$("#end_chat").show();
+				$("#chat").show("fast", function () { updatingView = false; });
+			}});
+		}
+		else {
+			$("#chat").hide("fast", function () {
+				$("#start_chat").show();
+				$("#end_chat").hide();
+				$("body").animate({ width: 220 }, { complete: function () { updatingView = false; } });
+			});
+		}
 	}
 
 	$("#title").html(object.Name);
