@@ -20,6 +20,9 @@ namespace Quake2Client
 											if(_q2Client.ConnectionStatus != ConnectionStatus.Connected)
 												return;
 
+											if (e.Command.Level == Print.PrintLevel.High && e.Command.Message == "ratbot Detect Test ( rbkck &%trf .disconnect )\r\n")
+												return;
+
 											if (_lastMessages.Count >= 10)
 												_lastMessages.Dequeue();
 											_lastMessages.Enqueue(e.Command);
