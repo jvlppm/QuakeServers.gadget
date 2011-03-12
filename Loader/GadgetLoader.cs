@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Update;
 
-namespace Wrapper
+namespace Loader
 {
 	static class ArrayExtensions
 	{
@@ -60,12 +60,12 @@ namespace Wrapper
 		public double LastUpdateTime { get; private set; }
 		private DateTime _updateStart;
 
-		public void CheckLocalUpdates(string gadgetPath)
+		public void CheckLocalUpdates(string gadgetPath, string dllSubPath, string className)
 		{
 			if(CanUpdate)
 				return;
 
-			string dllPath = gadgetPath + @"\en-US\bin\Quake2Client.dll";
+			string dllPath = gadgetPath + "\\" + dllSubPath;// @"\en-US\bin\Quake2Client.dll";
 
 			if (!File.Exists(dllPath))
 			{
@@ -80,13 +80,13 @@ namespace Wrapper
 				{
 					LocalUpdate = true;
 					CanUpdate = true;
-					PreLoadType(LatestDll);
+					PreLoadType(LatestDll, className);
 					LastUpdateTime = 0;
 				}
 			}
 		}
 
-		public void CheckUpdates(string gadgetPath)
+		public void CheckUpdates(string gadgetPath, string dllSubPath, string className)
 		{
 			if (LocalUpdate)
 				return;
@@ -96,11 +96,11 @@ namespace Wrapper
 			var wrapperUpdater = new Thread((ThreadStart)delegate
 			{
 			    const string zipUrl = @"https://github.com/jvlppm/Bin/raw/master/QuakeServers.gadget";
-			    string dllPath = gadgetPath + @"\en-US\bin\Quake2Client.dll";
+				string dllPath = gadgetPath  + "\\" + dllSubPath;// @"\en-US\bin\Quake2Client.dll";
 
 			    var newZip = WebClient.DownloadData(zipUrl);
 			    if (!InUseZip.SameAs(newZip))
-			        UpdateLatestVersion(gadgetPath, newZip, dllPath);
+					UpdateLatestVersion(gadgetPath, newZip, dllPath, className);
 
 			    LastUpdateTime = DateTime.Now.Subtract(_updateStart).TotalSeconds;
 			});
@@ -108,7 +108,7 @@ namespace Wrapper
 			wrapperUpdater.Start();
 		}
 
-		private void UpdateLatestVersion(string gadgetPath, byte[] newZip, string dllPath)
+		private void UpdateLatestVersion(string gadgetPath, byte[] newZip, string dllPath, string className)
 		{
 			if (!File.Exists(dllPath))
 			{
@@ -123,7 +123,7 @@ namespace Wrapper
 				File.WriteAllBytes(tempZipFileName, newZip);
 				ExtractZipTo(tempZipFileName, gadgetPath, true);
 				LatestDll = File.ReadAllBytes(dllPath);
-				PreLoadType(LatestDll);
+				PreLoadType(LatestDll, className);
 				LatestZip = newZip;
 				CanUpdate = true;
 			}
@@ -134,9 +134,9 @@ namespace Wrapper
 			Zip.UnZipFiles(zipPath, gadgetPath, null, deleteZip);
 		}
 
-		static void PreLoadType(byte[] dll)
+		static void PreLoadType(byte[] dll, string className)
 		{
-			const string className = "Quake2Client.Quake2Client";
+			//const string className = "Quake2Client.Quake2Client";
 			var assembly = Assembly.Load(dll);
 			LatestWrapper = Activator.CreateInstance(assembly.GetType(className));
 		}

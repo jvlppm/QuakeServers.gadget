@@ -7,10 +7,15 @@ function SetupGadget() {
 	checkDockState();
 }
 
+var afterErrorCallback;
 function SetupError() {
 	var errorDiv = $("#error");
 	errorDiv.get(0).onclick = function () {
 		errorDiv.hide("fast");
+		if (afterErrorCallback) {
+			afterErrorCallback();
+			afterErrorCallback = null;
+		}
 	};
 }
 
@@ -56,11 +61,11 @@ function updateSize(width, height) {
 var initialized = false;
 
 function CheckForUpdates() {
-	updater.CheckUpdates(System.Gadget.path);
+	updater.CheckUpdates(System.Gadget.path, "en-US\\bin\\Quake2Client.dll", "Quake2Client.Quake2Client");
 }
 
 function CheckForLocalUpdates() {
-	updater.CheckLocalUpdates(System.Gadget.path);
+	updater.CheckLocalUpdates(System.Gadget.path, "en-US\\bin\\Quake2Client.dll", "Quake2Client.Quake2Client");
 }
 
 function LimitValue(value, min, max) {
@@ -113,7 +118,9 @@ var updater;
 function SetupWrapper() {
 	builder = new GadgetBuilder();
 	builder.Initialize();
-	updater = builder.LoadType("Wrapper.dll", "Wrapper.GadgetLoader");
+	updater = builder.LoadType("Loader.dll", "Loader.GadgetLoader");
+	if (!updater)
+		throw { code: 1, message: "Loader não pode ser carregado"};
 }
 
 function Unregister() {
@@ -123,17 +130,36 @@ function Unregister() {
 	builder = null;
 }
 
-function ShowError(message) {
-	$("#error").html(message).show("fast");
+function ShowError(exception, hideErrorMessage, hideErrorMethod) {
+	var text = exception;
+	if (exception.message)
+		text = exception.message;
+
+	if (hideErrorMethod || !afterErrorCallback) {
+		afterErrorCallback = hideErrorMethod;
+
+		if (hideErrorMessage)
+			$("#close_error").html(hideErrorMessage);
+	}
+
+	$("#error_message").html(text);
+	$("#error").show("fast");
 }
 
 //
 
 $(document).ready(function () {
-	SetupGadget();
-	SetupWrapper();
-	CheckForUpdates();
-	updateGadget();
+	try {
+		SetupGadget();
+		SetupWrapper();
+		CheckForUpdates();
 
-	setInterval(updateGadget, 1000);
+		setInterval(updateGadget, 1000);
+		updateGadget();
+	}
+	catch (Exception) {
+		ShowError(Exception, "Tentar novamente", function () {
+			document.URL = document.URL;
+		});
+	}
 });
