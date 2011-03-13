@@ -57,6 +57,9 @@ namespace Quake2Client
 
 		public void UpdateServers()
 		{
+			if(Process.GetProcesses().Any(p => p.ProcessName.ToLower().Contains("q2")))
+				_lastPlay = DateTime.Now;
+
 			foreach (var server in ServerList)
 			{
 				string hostname = server.Ip.Split(':')[0];
@@ -98,6 +101,12 @@ namespace Quake2Client
 		#region Settings
 
 		public string RootPath { get; set; }
+
+		private DateTime _lastPlay = DateTime.MinValue;
+		public int MinutesSinceLastPlay
+		{
+			get { return (int)DateTime.Now.Subtract(_lastPlay).TotalMinutes; }
+		}
 
 		#region Game
 		public string GamePath
@@ -176,8 +185,7 @@ namespace Quake2Client
 			get
 			{
 				int result;
-				int.TryParse(Settings.ReadValue(RootPath, "Gadget", "AutoLaunchMinPlayers"), out result);
-				return result;
+				return int.TryParse(Settings.ReadValue(RootPath, "Gadget", "AutoLaunchMinPlayers"), out result) ? result : 1;
 			}
 			set { Settings.WriteValue(RootPath, "Gadget", "AutoLaunchMinPlayers", value.ToString()); }
 		}
@@ -187,8 +195,7 @@ namespace Quake2Client
 			get
 			{
 				int result;
-				int.TryParse(Settings.ReadValue(RootPath, "Gadget", "AutoLaunchMinTime"), out result);
-				return result;
+				return int.TryParse(Settings.ReadValue(RootPath, "Gadget", "AutoLaunchMinTime"), out result) ? result : 60;
 			}
 			set { Settings.WriteValue(RootPath, "Gadget", "AutoLaunchMinTime", value.ToString()); }
 		}
