@@ -37,7 +37,7 @@ function updateView() {
 		}
 	}
 
-	if (Wrapper.GamePath && !object.IsPlaying)
+	if (Wrapper.GamePath && !Wrapper.IsPlaying)
 		$("#join").show();
 	else $("#join").hide();
 

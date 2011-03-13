@@ -27,6 +27,10 @@ $(document).ready(function () {
 	wrapper = System.Gadget.document.Wrapper;
 	UpdateView();
 
+	if (wrapper.AutoLaunch)
+		$("#autolaunch").attr("checked", "checked");
+	else
+		$("#autolaunch").removeAttr("checked");
 	$("#autolaunch_minplayers").val(wrapper.AutoLaunchMinPlayers);
 
 	$("input[name=autolaunch_timescale]").each(function () {
@@ -55,6 +59,7 @@ $(document).ready(function () {
 	System.Gadget.onSettingsClosing = function (event) {
 		if (event.closeAction == event.Action.commit) {
 			wrapper.SaveSettings();
+			wrapper.AutoLaunch = $("#autolaunch").is(":checked");
 			wrapper.AutoLaunchMinPlayers = $("#autolaunch_minplayers").val();
 			wrapper.AutoLaunchMinTime = $("#autolaunch_mintime").val() * $("input[name=autolaunch_timescale]:checked").val();
 		}

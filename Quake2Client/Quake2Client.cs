@@ -57,8 +57,12 @@ namespace Quake2Client
 
 		public void UpdateServers()
 		{
-			if(Process.GetProcesses().Any(p => p.ProcessName.ToLower().Contains("q2")))
+			if (Process.GetProcesses().Any(p => p.ProcessName.ToLower().Contains("q2")))
+			{
 				_lastPlay = DateTime.Now;
+				_externalPlaying = true;
+			}
+			else _externalPlaying = false;
 
 			foreach (var server in ServerList)
 			{
@@ -107,6 +111,9 @@ namespace Quake2Client
 		{
 			get { return (int)DateTime.Now.Subtract(_lastPlay).TotalMinutes; }
 		}
+
+		private bool _internalPlaying, _externalPlaying;
+		public bool IsPlaying { get { return _internalPlaying || _externalPlaying; } }
 
 		#region Game
 		public string GamePath
@@ -180,6 +187,16 @@ namespace Quake2Client
 
 		#region Gadget
 
+		public bool AutoLaunch
+		{
+			get
+			{
+				bool result;
+				return bool.TryParse(Settings.ReadValue(RootPath, "Gadget", "AutoLaunch"), out result) ? result : false;
+			}
+			set { Settings.WriteValue(RootPath, "Gadget", "AutoLaunch", value.ToString()); }
+		}
+
 		public int AutoLaunchMinPlayers
 		{
 			get
@@ -220,9 +237,9 @@ namespace Quake2Client
 				StartInfo = startInfo
 			};
 
-			server.IsPlaying = true;
+			_internalPlaying = true;
 
-			q2.Exited += delegate { server.IsPlaying = false; };
+			q2.Exited += delegate { _internalPlaying = false; };
 
 			q2.Start();
 		}
