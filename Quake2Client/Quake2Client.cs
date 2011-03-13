@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Quake2Client
 {
@@ -38,6 +39,7 @@ namespace Quake2Client
 			};
 		}
 
+		#region Servers
 		public ServerInfo GetServerInfo(string ip)
 		{
 			ServerInfo serverInfo = ServerList.FirstOrDefault(s => s.Ip == ip);
@@ -89,5 +91,73 @@ namespace Quake2Client
 			}
 			req.Server.Players = players;
 		}
+		#endregion
+
+		#region Settings
+		public string GamePath
+		{
+			get { return Settings.ReadValue("Game", "Path"); }
+			private set { Settings.WriteValue("Game", "Path", value); }
+		}
+		public string GameCFG
+		{
+			get { return Settings.ReadValue("Game", "CFG"); }
+			private set { Settings.WriteValue("Game", "CFG", value); }
+		}
+
+		private string _latchedGamePath;
+		public string LatchedGamePath
+		{
+			get { return _latchedGamePath ?? GamePath; }
+			set { _latchedGamePath = value; }
+		}
+
+		private string _latchedGameCFG;
+		public string LatchedGameCFG
+		{
+			get { return _latchedGameCFG ?? GameCFG; }
+			set { _latchedGameCFG = value; }
+		}
+
+		public void BrowseGamePath()
+		{
+			var dialog = new OpenFileDialog
+			             	{
+			             		Filter = "Arquivos Executáveis|*.exe",
+								Title = "Selecione o executável do jogo"
+			             	};
+			if (dialog.ShowDialog() == DialogResult.OK)
+				LatchedGamePath = dialog.FileName;
+		}
+
+		public void BrowseGameCFG()
+		{
+			if (string.IsNullOrEmpty(LatchedGamePath))
+				throw new Exception("GamePath must be set");
+
+			var dialog = new OpenFileDialog
+			{
+				Filter = "Arquivos Config|*cfg",
+				Title = "Selecione o arquivo config",
+				InitialDirectory = System.IO.Path.GetDirectoryName(LatchedGamePath) + "\\Action"
+			};
+			if (dialog.ShowDialog() == DialogResult.OK)
+				LatchedGameCFG = System.IO.Path.GetFileName(dialog.FileName);
+		}
+
+		public void SaveSettings()
+		{
+			GamePath = LatchedGamePath;
+			GameCFG = LatchedGameCFG;
+			LatchedGamePath = null;
+			LatchedGameCFG = null;
+		}
+
+		public void DiscardSettings()
+		{
+			LatchedGamePath = null;
+			LatchedGameCFG = null;
+		}
+		#endregion
 	}
 }

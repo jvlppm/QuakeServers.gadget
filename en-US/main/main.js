@@ -42,6 +42,9 @@ function UpdateView() {
 }
 
 $(document).ready(function () {
+	System.Gadget.settingsUI = "main/settings/settings.html";
+	System.Gadget.document.Wrapper = Wrapper;
+
 	UpdateView();
 	Wrapper.UpdateServers();
 	setInterval(function () { Wrapper.UpdateServers(); }, 10000);
