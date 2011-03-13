@@ -221,7 +221,7 @@ namespace Quake2Client
 
 		#endregion
 
-		public void LaunchGame(ServerInfo server)
+		public void LaunchGame(string serverIp)
 		{
 			if (string.IsNullOrEmpty(GamePath))
 				throw new Exception("GamePath must be set");
@@ -229,7 +229,7 @@ namespace Quake2Client
 			var startInfo = new ProcessStartInfo(GamePath,
 												 "+set game action " +
 												 (!string.IsNullOrEmpty(GameCFG) ? " +exec " + GameCFG : "") + " +connect " +
-												 server.Ip);
+												 serverIp);
 
 			var q2 = new Process
 			{
@@ -238,6 +238,7 @@ namespace Quake2Client
 			};
 
 			_internalPlaying = true;
+			_lastPlay = DateTime.Now;
 
 			q2.Exited += delegate { _internalPlaying = false; };
 

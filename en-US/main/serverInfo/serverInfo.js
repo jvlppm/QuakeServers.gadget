@@ -65,7 +65,7 @@ $(document).ready(function () {
 
 	$("#join").get(0).onclick = function () {
 		$("#end_chat").get(0).onclick();
-		Wrapper.LaunchGame(object);
+		Wrapper.LaunchGame(object.Ip);
 	};
 
 	if (!object.IsConnected) {
