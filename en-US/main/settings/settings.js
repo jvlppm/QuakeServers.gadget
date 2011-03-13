@@ -27,13 +27,17 @@ $(document).ready(function () {
 	wrapper = System.Gadget.document.Wrapper;
 	UpdateView();
 
-	$("#choose_gamepath").get(0).onclick = function () {
-		wrapper.BrowseGamePath();
-	};
+	$("#choose_gamepath, #gamepath").each(function () {
+		$(this).get(0).onclick = function () {
+			wrapper.BrowseGamePath();
+		};
+	});
 
-	$("#choose_gamecfg").get(0).onclick = function () {
-		wrapper.BrowseGameCFG();
-	};
+	$("#choose_gamecfg, #gamecfg").each(function () {
+		$(this).get(0).onclick = function () {
+			wrapper.BrowseGameCFG();
+		};
+	});
 
 	setInterval(function () {
 		UpdateView();

@@ -85,6 +85,8 @@ namespace Quake2Client
 			}
 		}
 
+		public bool IsPlaying { get; internal set; }
+
 		public bool UpdatingConnection
 		{
 			get

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -126,10 +127,10 @@ namespace Quake2Client
 		public void BrowseGamePath()
 		{
 			var dialog = new OpenFileDialog
-			             	{
-			             		Filter = "Arquivos Executáveis|*.exe",
+							{
+								Filter = "Arquivos Executáveis|*.exe",
 								Title = "Selecione o executável do jogo"
-			             	};
+							};
 			if (!string.IsNullOrEmpty(LatchedGamePath))
 				dialog.InitialDirectory = Path.GetDirectoryName(LatchedGamePath);
 
@@ -166,5 +167,28 @@ namespace Quake2Client
 			LatchedGameCFG = null;
 		}
 		#endregion
+
+		public void LaunchGame(ServerInfo server)
+		{
+			if (string.IsNullOrEmpty(GamePath))
+				throw new Exception("GamePath must be set");
+
+			var startInfo = new ProcessStartInfo(GamePath,
+												 "+set game action " +
+												 (!string.IsNullOrEmpty(GameCFG) ? " +exec " + GameCFG : "") + " +connect " +
+												 server.Ip);
+
+			var q2 = new Process
+			{
+				EnableRaisingEvents = true,
+				StartInfo = startInfo
+			};
+
+			server.IsPlaying = true;
+
+			q2.Exited += delegate { server.IsPlaying = false; };
+
+			q2.Start();
+		}
 	}
 }

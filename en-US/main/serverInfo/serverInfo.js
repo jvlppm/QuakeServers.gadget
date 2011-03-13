@@ -37,6 +37,10 @@ function updateView() {
 		}
 	}
 
+	if (Wrapper.GamePath && !object.IsPlaying)
+		$("#join").show();
+	else $("#join").hide();
+
 	$("#title").html(object.Name);
 
 	$("#map").html(object.GetSetting("mapname"));
@@ -57,6 +61,11 @@ $(document).ready(function () {
 	$("#chat_say").get(0).onclick = function () {
 		object.Say($("#chat_input").val());
 		$("#chat_input").val("");
+	};
+
+	$("#join").get(0).onclick = function () {
+		$("#end_chat").get(0).onclick();
+		Wrapper.LaunchGame(object);
 	};
 
 	if (!object.IsConnected) {
