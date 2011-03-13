@@ -7,17 +7,19 @@ function UpdateView() {
 	if (!$("#gamepath").html()) {
 		$("#gamepath").html("&lt;Não selecionado&gt;");
 		$("#gamepath").addClass("error");
+		$("#gamecfg").parent("div:eq(0)").hide();
 	}
 	else {
 		$("#gamepath").removeClass("error");
-	}
+		$("#gamecfg").parent("div:eq(0)").show("fast");
 
-	if (!$("#gamecfg").html()) {
-		$("#gamecfg").html("&lt;Não selecionado&gt;");
-		$("#gamecfg").addClass("error");
-	}
-	else {
-		$("#gamecfg").removeClass("error");
+		if (!$("#gamecfg").html()) {
+			$("#gamecfg").html("&lt;Não selecionado&gt;");
+			$("#gamecfg").addClass("error");
+		}
+		else {
+			$("#gamecfg").removeClass("error");
+		}
 	}
 }
 

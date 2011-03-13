@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -94,15 +95,18 @@ namespace Quake2Client
 		#endregion
 
 		#region Settings
+
+		public string RootPath { get; set; }
+
 		public string GamePath
 		{
-			get { return Settings.ReadValue("Game", "Path"); }
-			private set { Settings.WriteValue("Game", "Path", value); }
+			get { return Settings.ReadValue(RootPath, "Game", "Path"); }
+			private set { Settings.WriteValue(RootPath, "Game", "Path", value); }
 		}
 		public string GameCFG
 		{
-			get { return Settings.ReadValue("Game", "CFG"); }
-			private set { Settings.WriteValue("Game", "CFG", value); }
+			get { return Settings.ReadValue(RootPath, "Game", "CFG"); }
+			private set { Settings.WriteValue(RootPath, "Game", "CFG", value); }
 		}
 
 		private string _latchedGamePath;
@@ -126,6 +130,9 @@ namespace Quake2Client
 			             		Filter = "Arquivos Executáveis|*.exe",
 								Title = "Selecione o executável do jogo"
 			             	};
+			if (!string.IsNullOrEmpty(LatchedGamePath))
+				dialog.InitialDirectory = Path.GetDirectoryName(LatchedGamePath);
+
 			if (dialog.ShowDialog() == DialogResult.OK)
 				LatchedGamePath = dialog.FileName;
 		}
@@ -139,10 +146,10 @@ namespace Quake2Client
 			{
 				Filter = "Arquivos Config|*cfg",
 				Title = "Selecione o arquivo config",
-				InitialDirectory = System.IO.Path.GetDirectoryName(LatchedGamePath) + "\\Action"
+				InitialDirectory = Path.GetDirectoryName(LatchedGamePath) + "\\Action"
 			};
 			if (dialog.ShowDialog() == DialogResult.OK)
-				LatchedGameCFG = System.IO.Path.GetFileName(dialog.FileName);
+				LatchedGameCFG = Path.GetFileName(dialog.FileName);
 		}
 
 		public void SaveSettings()

@@ -44,6 +44,7 @@ function UpdateView() {
 $(document).ready(function () {
 	System.Gadget.settingsUI = "main/settings/settings.html";
 	System.Gadget.document.Wrapper = Wrapper;
+	Wrapper.RootPath = System.Gadget.path;
 
 	UpdateView();
 	Wrapper.UpdateServers();

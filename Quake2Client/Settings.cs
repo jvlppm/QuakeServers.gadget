@@ -6,22 +6,20 @@ namespace Quake2Client
 {
 	public static class Settings
 	{
-		readonly static string Path = string.Format(@"{0}\{1}", Assembly.GetExecutingAssembly().Location, "Settings.ini");
-
 		[DllImport("kernel32")]
 		private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
 		[DllImport("kernel32")]
 		private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
 
-		public static void WriteValue(string section, string key, string value)
+		public static void WriteValue(string path, string section, string key, string value)
 		{
-			WritePrivateProfileString(section, key, value, Path);
+			WritePrivateProfileString(section, key, value, path + "\\Settings.ini");
 		}
 
-		public static string ReadValue(string section, string key)
+		public static string ReadValue(string path, string section, string key)
 		{
 			StringBuilder temp = new StringBuilder(255);
-			GetPrivateProfileString(section, key, "", temp, 255, Path);
+			GetPrivateProfileString(section, key, "", temp, 255, path + "\\Settings.ini");
 			return temp.ToString();
 		}
 	}
