@@ -27,6 +27,15 @@ $(document).ready(function () {
 	wrapper = System.Gadget.document.Wrapper;
 	UpdateView();
 
+	$("#autolaunch_minplayers").val(wrapper.AutoLaunchMinPlayers);
+
+	$("input[name=autolaunch_timescale]").each(function () {
+		if (wrapper.AutoLaunchMinTime % $(this).val() == 0) {
+			$("#autolaunch_mintime").val(wrapper.AutoLaunchMinTime / $(this).val());
+			$(this).attr("checked", "checked");
+		}
+	});
+
 	$("#choose_gamepath, #gamepath").each(function () {
 		$(this).get(0).onclick = function () {
 			wrapper.BrowseGamePath();
@@ -46,6 +55,8 @@ $(document).ready(function () {
 	System.Gadget.onSettingsClosing = function (event) {
 		if (event.closeAction == event.Action.commit) {
 			wrapper.SaveSettings();
+			wrapper.AutoLaunchMinPlayers = $("#autolaunch_minplayers").val();
+			wrapper.AutoLaunchMinTime = $("#autolaunch_mintime").val() * $("input[name=autolaunch_timescale]:checked").val();
 		}
 		else if (event.closeAction == event.Action.cancel) {
 			wrapper.DiscardSettings();

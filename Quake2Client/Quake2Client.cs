@@ -99,6 +99,7 @@ namespace Quake2Client
 
 		public string RootPath { get; set; }
 
+		#region Game
 		public string GamePath
 		{
 			get { return Settings.ReadValue(RootPath, "Game", "Path"); }
@@ -166,6 +167,34 @@ namespace Quake2Client
 			LatchedGamePath = null;
 			LatchedGameCFG = null;
 		}
+		#endregion
+
+		#region Gadget
+
+		public int AutoLaunchMinPlayers
+		{
+			get
+			{
+				int result;
+				int.TryParse(Settings.ReadValue(RootPath, "Gadget", "AutoLaunchMinPlayers"), out result);
+				return result;
+			}
+			set { Settings.WriteValue(RootPath, "Gadget", "AutoLaunchMinPlayers", value.ToString()); }
+		}
+
+		public int AutoLaunchMinTime
+		{
+			get
+			{
+				int result;
+				int.TryParse(Settings.ReadValue(RootPath, "Gadget", "AutoLaunchMinTime"), out result);
+				return result;
+			}
+			set { Settings.WriteValue(RootPath, "Gadget", "AutoLaunchMinTime", value.ToString()); }
+		}
+
+		#endregion
+
 		#endregion
 
 		public void LaunchGame(ServerInfo server)
