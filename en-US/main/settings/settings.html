@@ -5,15 +5,29 @@
 		<script language="javascript" type="text/javascript" src="settings.js"></script>
 	</head>
 	<body>
-		<div class="row">
-			<label for="gamepath">Game:</label>
-			<img class="button" id="choose_gamepath" src="../images/folder.png"/>
-			<span class="button" id="gamepath">D:\Jogos\Quake 2\aq2.exe</span>
+		<div class="rowgroup">
+			<div class="row">
+				<label for="gamepath">Game:</label>
+				<img class="button" id="choose_gamepath" src="../images/folder.png"/>
+				<span class="button" id="gamepath"></span>
+			</div>
+			<div class="row after_gamepath">
+				<label for="cfg">Config:</label>
+				<img class="button" id="choose_gamecfg" src="../images/folder.png"/>
+				<span class="button" id="gamecfg"></span>
+			</div>
 		</div>
-		<div class="row">
-			<label for="cfg">Config:</label>
-			<img class="button" id="choose_gamecfg" src="../images/folder.png"/>
-			<span class="button" id="gamecfg">kal.ucfg</span>
+		<div class="rowgroup after_gamepath">
+			<div class="header">Iniciar jogo automaticamente se:</div>
+			<div class="row" style="margin-left: 10px;">
+				<input id="autolaunch_minplayers" type="text" size="2" maxlength="2" />
+				<label for="autolaunch_minplayers" style="width:auto;font-weight:normal;">players estiverem conectados.</label>
+			</div>
+			<div class="row" style="margin-left: 10px;">
+				<label for="autolaunch_mintime" style="width:auto;font-weight:normal;">Já se passaram</label>
+				<input id="autolaunch_mintime" type="text" size="2" maxlength="2" />
+				<span><input name="autolaunch_timescale" type="radio" value="1"/>minutos<input name="autolaunch_timescale" type="radio" value="60"/>horas</span>
+			</div>
 		</div>
 	</body>
 </html>

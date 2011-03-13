@@ -1,12 +1,23 @@
 ﻿body 
 {
 	width: 400px;
-	height: 100px;
+	height: 150px;
 }
 
 .row
 {
 	margin-bottom: 5px;
+}
+
+.rowgroup
+{
+	margin-bottom: 15px;
+}
+
+.rowgroup .header
+{
+	font-weight:bold;
+	margin-bottom: 10px;
 }
 
 .button

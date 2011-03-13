@@ -7,11 +7,11 @@ function UpdateView() {
 	if (!$("#gamepath").html()) {
 		$("#gamepath").html("&lt;Não selecionado&gt;");
 		$("#gamepath").addClass("error");
-		$("#gamecfg").parent("div:eq(0)").hide();
+		$(".after_gamepath").hide("fast");
 	}
 	else {
 		$("#gamepath").removeClass("error");
-		$("#gamecfg").parent("div:eq(0)").show("fast");
+		$(".after_gamepath").show("fast");
 
 		if (!$("#gamecfg").html()) {
 			$("#gamecfg").html("&lt;Não selecionado&gt;");
