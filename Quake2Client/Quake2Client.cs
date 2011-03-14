@@ -66,13 +66,20 @@ namespace Quake2Client
 
 			foreach (var server in ServerList)
 			{
-				string hostname = server.Ip.Split(':')[0];
-				int port = int.Parse(server.Ip.Split(':')[1]);
+				try
+				{
+					string hostname = server.Ip.Split(':')[0];
+					int port = int.Parse(server.Ip.Split(':')[1]);
 
-				var socket = new UdpClient(hostname, port);
-				socket.Send(_queryData, _queryData.Length);
+					var socket = new UdpClient(hostname, port);
+					socket.Send(_queryData, _queryData.Length);
 
-				socket.BeginReceive(ReceiveServerInfo, new AsyncRequest { Server = server, Socket = socket });
+					socket.BeginReceive(ReceiveServerInfo, new AsyncRequest { Server = server, Socket = socket });
+				}
+				catch (Exception ex)
+				{
+					server.LastError = ex.Message;
+				}
 			}
 		}
 
@@ -81,24 +88,32 @@ namespace Quake2Client
 			var req = (AsyncRequest)ar.AsyncState;
 			var serverEP = new IPEndPoint(IPAddress.Any, 27910);
 
-			byte[] resp = req.Socket.EndReceive(ar, ref serverEP);
-			string serverStrResponse = resp.Aggregate(string.Empty, (current, c) => current + (char)c);
-			string[] serverResponse = serverStrResponse.Substring(4).Split('\n');
-
-			var serverInfo = new Dictionary<string, object>();
-			var serverKeyValues = serverResponse[1].Split('\\');
-			for (int i = 1; i < serverKeyValues.Length; i += 2)
-				serverInfo.Add(serverKeyValues[i], serverKeyValues[i + 1]);
-
-			req.Server.Settings = serverInfo;
-			var players = new List<PlayerInfo>();
-			for (int i = 2; i < serverResponse.Length; i++)
+			try
 			{
-				string[] pInfo = serverResponse[i].Split(' ');
-				if (pInfo.Length == 3)
-					players.Add(new PlayerInfo { Name = pInfo[2].Trim('\"'), Frags = pInfo[0], Ping = pInfo[1] });
+				byte[] resp = req.Socket.EndReceive(ar, ref serverEP);
+				string serverStrResponse = resp.Aggregate(string.Empty, (current, c) => current + (char)c);
+				string[] serverResponse = serverStrResponse.Substring(4).Split('\n');
+
+				var serverInfo = new Dictionary<string, object>();
+				var serverKeyValues = serverResponse[1].Split('\\');
+				for (int i = 1; i < serverKeyValues.Length; i += 2)
+					serverInfo.Add(serverKeyValues[i], serverKeyValues[i + 1]);
+
+				req.Server.Settings = serverInfo;
+				var players = new List<PlayerInfo>();
+				for (int i = 2; i < serverResponse.Length; i++)
+				{
+					string[] pInfo = serverResponse[i].Split(' ');
+					if (pInfo.Length == 3)
+						players.Add(new PlayerInfo { Name = pInfo[2].Trim('\"'), Frags = pInfo[0], Ping = pInfo[1] });
+				}
+				req.Server.Players = players;
+				req.Server.LastError = null;
 			}
-			req.Server.Players = players;
+			catch (Exception ex)
+			{
+				req.Server.LastError = ex.Message;
+			}
 		}
 		#endregion
 

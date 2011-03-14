@@ -35,6 +35,9 @@ function UpdateView() {
 			serverDiv.get(0).object = currentServer;
 			serverDiv.find(" > .server_name").html(currentServer.Name);
 			serverDiv.find(" > .server_info").html(currentServer.NumberOfPlayers + " players");
+			if (currentServer.LastError)
+				serverDiv.addClass("server_error");
+			else serverDiv.removeClass("server_error");
 
 			if (currentServer.NumberOfPlayers > 0)
 				serverDiv.addClass("has_players");

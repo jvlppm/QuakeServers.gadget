@@ -45,13 +45,21 @@ function updateView() {
 
 	$("#map").html(object.GetSetting("mapname"));
 
-	$("#players").html("");
-	var players;
-	eval("players = " + object.GetPlayers() + ";");
-	if (players) {
-		for (var i = 0; i < players.length; i++) {
-			$("#players").append("<div>" + players[i].Name + " - " + players[i].Frags + " - " + players[i].Ping + "</div>");
-		} 
+	if (object.LastError) {
+		$("#players").html("").hide();
+		$("#server_error").html(object.LastError).show();
+	}
+	else {
+		$("#players").html("").show();
+		$("#server_error").html("").hide();
+		
+		var players;
+		eval("players = " + object.GetPlayers() + ";");
+		if (players) {
+			for (var i = 0; i < players.length; i++) {
+				$("#players").append("<div>" + players[i].Name + " - " + players[i].Frags + " - " + players[i].Ping + "</div>");
+			}
+		}
 	}
 }
 

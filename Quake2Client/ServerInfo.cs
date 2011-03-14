@@ -56,6 +56,8 @@ namespace Quake2Client
 
 		public object GetSetting(string name)
 		{
+			if (!Settings.ContainsKey(name))
+				return string.Empty;
 			return Settings[name];
 		}
 
@@ -110,5 +112,7 @@ namespace Quake2Client
 		public int NumberOfPlayers { get { return Players == null ? 0 : Players.Where(p => p.Name != "WindowsGadget").Count(); } }
 
 		public Dictionary<string, object> Settings { get; set; }
+
+		public string LastError { get; set; }
 	}
 }
