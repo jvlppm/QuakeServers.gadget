@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Quake2;
@@ -106,7 +107,7 @@ namespace Quake2Client
 		public string LastMessages { get { return Json.Extract(_lastMessages); } }
 
 		public List<PlayerInfo> Players { get; set; }
-		public int NumberOfPlayers { get { return Players == null ? 0 : Players.Count; } }
+		public int NumberOfPlayers { get { return Players == null ? 0 : Players.Where(p => p.Name != "WindowsGadget").Count(); } }
 
 		public Dictionary<string, object> Settings { get; set; }
 	}
