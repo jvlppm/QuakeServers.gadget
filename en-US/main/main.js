@@ -39,7 +39,7 @@ function UpdateView() {
 			serverDiv.addClass("has_players");
 		else serverDiv.removeClass("has_players");
 
-		if (!Wrapper.IsPlaying) {
+		if (!Wrapper.IsPlaying && Wrapper.GamePath && Wrapper.AutoLaunch) {
 			if (currentServer.NumberOfPlayers >= Wrapper.AutoLaunchMinPlayers) {
 				if (Wrapper.MinutesSinceLastPlay >= Wrapper.AutoLaunchMinTime) {
 					Wrapper.LaunchGame(currentServer.Ip);
