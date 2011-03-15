@@ -198,6 +198,12 @@ namespace Quake2Client
 			LatchedGamePath = null;
 			LatchedGameCFG = null;
 		}
+
+		public string CustomArgs
+		{
+			get { return Settings.ReadValue(RootPath, "Game", "CustomArgs"); }
+			set { Settings.WriteValue(RootPath, "Game", "CustomArgs", value); }
+		}
 		#endregion
 
 		#region Gadget
@@ -242,9 +248,12 @@ namespace Quake2Client
 				throw new Exception("GamePath must be set");
 
 			var startInfo = new ProcessStartInfo(GamePath,
-												 "+set game action " +
-												 (!string.IsNullOrEmpty(GameCFG) ? " +exec " + GameCFG : "") + " +connect " +
-												 serverIp);
+			                                     "+set game action " +
+			                                     (!string.IsNullOrEmpty(GameCFG) ? " +exec " + GameCFG : "") + " " + CustomArgs +
+			                                     " +connect " + serverIp)
+			                	{
+			                		WorkingDirectory = Path.GetDirectoryName(GamePath)
+			                	};
 
 			var q2 = new Process
 			{

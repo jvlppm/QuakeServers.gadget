@@ -52,6 +52,8 @@ $(document).ready(function () {
 		};
 	});
 
+	$("#arguments").val(wrapper.CustomArgs);
+
 	setInterval(function () {
 		UpdateView();
 	}, 200);
@@ -62,6 +64,7 @@ $(document).ready(function () {
 			wrapper.AutoLaunch = $("#autolaunch").is(":checked");
 			wrapper.AutoLaunchMinPlayers = $("#autolaunch_minplayers").val();
 			wrapper.AutoLaunchMinTime = $("#autolaunch_mintime").val() * $("input[name=autolaunch_timescale]:checked").val();
+			wrapper.CustomArgs = $("#arguments").val();
 		}
 		else if (event.closeAction == event.Action.cancel) {
 			wrapper.DiscardSettings();

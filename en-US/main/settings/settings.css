@@ -1,7 +1,7 @@
-﻿body 
+﻿body
 {
 	width: 400px;
-	height: 160px;
+	height: 190px;
 }
 
 .row
@@ -16,13 +16,20 @@
 
 .rowgroup .header
 {
-	font-weight:bold;
+	font-weight: bold;
 	margin-bottom: 10px;
 }
 
 .button
 {
 	cursor: pointer;
+}
+
+span
+{
+	width: 200px;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 label
@@ -38,7 +45,7 @@ img
 	margin-right: 10px;
 }
 
-.error 
+.error
 {
 	color: Red;
 }
