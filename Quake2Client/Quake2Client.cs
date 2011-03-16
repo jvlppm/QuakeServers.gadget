@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Timer = System.Timers.Timer;
 
 namespace Quake2Client
 {
@@ -21,9 +22,26 @@ namespace Quake2Client
 		}
 		#endregion
 
-		List<ServerInfo> ServerList { get; set; }
+		#region Servers
+		public List<ServerInfo> StaticServerList { get; private set; }
+		public List<ServerInfo> QueryServerList { get; private set; }
+		public List<ServerInfo> MasterQ2Servers { get; private set; }
+		#endregion
 
-		public string Servers { get { return Json.Extract(ServerList); } }
+		private readonly List<List<ServerInfo>> _allServersLists;
+		private IEnumerable<ServerInfo> AllServers
+		{
+			get
+			{
+				return _allServersLists.SelectMany(list => list);
+			}
+		}
+
+		public string Servers
+		{
+			get { return Json.Extract(AllServers.Where(s => DateTime.Now.Subtract(s.LastUpdate).TotalSeconds <= 60).ToList()); }
+		}
+
 		private readonly byte[] _queryData;
 
 		public Quake2Client()
@@ -32,24 +50,51 @@ namespace Quake2Client
 			queryData.AddRange("status\n".Select(ch => (byte)ch));
 			_queryData = queryData.ToArray();
 
-			ServerList = new List<ServerInfo>
+			StaticServerList = new List<ServerInfo>
 			{
 				new ServerInfo("200.226.133.100:27911") { Name = "FRAG #1" },
 				new ServerInfo("200.177.229.248:27912") { Name = "TERRA #1"},
 				new ServerInfo("200.177.229.248:27913") { Name = "TERRA #2"},
-				//new ServerInfo("jvlppm.no-ip.org:27910") { Name = "Fake"}
 			};
+			QueryServerList = new List<ServerInfo>();
+			MasterQ2Servers = new List<ServerInfo>();
+
+			_allServersLists = new List<List<ServerInfo>>
+			{
+				StaticServerList,
+				QueryServerList,
+				MasterQ2Servers,
+			};
+
+			Timer masterQ2Servers = new Timer(10 * 1000);
+			masterQ2Servers.Elapsed += MasterQ2ServersElapsed;
+			masterQ2Servers.Enabled = true;
+			MasterQ2ServersElapsed(null, null);
+		}
+
+		void MasterQ2ServersElapsed(object sender, System.Timers.ElapsedEventArgs e)
+		{
+			WebClient client = new WebClient();
+			string servers = client.DownloadString("http://q2servers.com/?mod=action&c=br&raw=0&inc=1");
+
+			foreach (var server in servers.Split('\n'))
+			{
+				if(string.IsNullOrEmpty(server))
+					continue;
+				if (AllServers.All(oldServer => oldServer.Ip != server))
+					MasterQ2Servers.Add(new ServerInfo(server));
+			}
 		}
 
 		#region Servers
 		public ServerInfo GetServerInfo(string ip)
 		{
-			ServerInfo serverInfo = ServerList.FirstOrDefault(s => s.Ip == ip);
+			ServerInfo serverInfo = AllServers.FirstOrDefault(s => s.Ip == ip);
 
 			if (serverInfo == null)
 			{
 				serverInfo = new ServerInfo(ip);
-				ServerList.Add(serverInfo);
+				QueryServerList.Add(serverInfo);
 			}
 
 			return serverInfo;
@@ -64,7 +109,7 @@ namespace Quake2Client
 			}
 			else _externalPlaying = false;
 
-			foreach (var server in ServerList)
+			foreach (var server in AllServers)
 			{
 				try
 				{
@@ -104,11 +149,12 @@ namespace Quake2Client
 				for (int i = 2; i < serverResponse.Length; i++)
 				{
 					string[] pInfo = serverResponse[i].Split(' ');
-					if (pInfo.Length == 3)
-						players.Add(new PlayerInfo { Name = pInfo[2].Trim('\"'), Frags = pInfo[0], Ping = pInfo[1] });
+					if (pInfo.Length >= 3)
+						players.Add(new PlayerInfo { Name = string.Join(" ", pInfo, 2, pInfo.Length - 2).Trim('\"'), Frags = pInfo[0], Ping = pInfo[1] });
 				}
 				req.Server.Players = players;
 				req.Server.LastError = null;
+				req.Server.LastUpdate = DateTime.Now;
 			}
 			catch (Exception ex)
 			{
@@ -248,12 +294,12 @@ namespace Quake2Client
 				throw new Exception("GamePath must be set");
 
 			var startInfo = new ProcessStartInfo(GamePath,
-			                                     "+set game action " +
-			                                     (!string.IsNullOrEmpty(GameCFG) ? " +exec " + GameCFG : "") + " " + CustomArgs +
-			                                     " +connect " + serverIp)
-			                	{
-			                		WorkingDirectory = Path.GetDirectoryName(GamePath)
-			                	};
+												 "+set game action " +
+												 (!string.IsNullOrEmpty(GameCFG) ? " +exec " + GameCFG : "") + " " + CustomArgs +
+												 " +connect " + serverIp)
+								{
+									WorkingDirectory = Path.GetDirectoryName(GamePath)
+								};
 
 			var q2 = new Process
 			{

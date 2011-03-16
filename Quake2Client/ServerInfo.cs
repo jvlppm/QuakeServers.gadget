@@ -104,6 +104,8 @@ namespace Quake2Client
 			_q2Client.Send("say " + message + "\n");
 		}
 
+		internal DateTime LastUpdate { get; set; }
+
 		private readonly Queue<Print> _lastMessages;
 
 		public string LastMessages { get { return Json.Extract(_lastMessages); } }

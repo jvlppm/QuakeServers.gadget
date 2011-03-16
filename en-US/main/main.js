@@ -9,6 +9,8 @@ function showFlyout(page, object) {
 
 function UpdateView() {
 	try {
+		$("#main > div").addClass("server_down");
+
 		var servers = eval(Wrapper.Servers);
 		for (var i = 0; i < servers.length; i++) {
 			var currentServer = servers[i];
@@ -16,8 +18,8 @@ function UpdateView() {
 			var serverDiv = $("#main > div[server_ip='" + currentServer.Ip + "']");
 
 			if (!serverDiv.length) {
-				serverDiv = $(
-			"<div class='linha_tabela' server_ip='" + currentServer.Ip + "'>"
+				serverDiv =
+			$("<div class='linha_tabela' server_ip='" + currentServer.Ip + "'>"
 			+ "<div class='server_name'></div>"
 			+ "<div class='server_info'></div>"
 			+ "</div>");
@@ -31,6 +33,8 @@ function UpdateView() {
 				serverDiv.get(0).onclick = function () {
 					showFlyout("main/serverInfo/serverInfo.html", this.object);
 				};
+			} else {
+				serverDiv.removeClass("server_down");
 			}
 			serverDiv.get(0).object = currentServer;
 			serverDiv.find(" > .server_name").html(currentServer.Name);
@@ -51,6 +55,8 @@ function UpdateView() {
 				}
 			}
 		}
+
+		$("#main > div.server_down").remove();
 	}
 	catch (Exception) {
 		ShowError(Exception);
