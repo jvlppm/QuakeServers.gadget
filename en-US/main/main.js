@@ -7,6 +7,21 @@ function showFlyout(page, object) {
 	flyoutWin.object = object;
 }
 
+function updateSizes() {
+	$("div, table").each(function () {
+		$(this).width($(this).parent().width() - $(this).css("left").replace("px", "") - $(this).css("right").replace("px", ""));
+
+		if ($(this).is("table")) {
+			Wrapper = Wrapper;
+		}
+
+		if (!$(this).css("top") || $(this).css("top") == "auto")
+			$(this).css("top", $(this).parent().height() - $(this).height());
+
+		$(this).height($(this).parent().height() - $(this).css("top").replace("px", "") - $(this).css("bottom").replace("px", ""));
+	});
+}
+
 function UpdateView() {
 	try {
 		$("#main > div").addClass("server_down");
@@ -20,6 +35,12 @@ function UpdateView() {
 			if (!serverDiv.length) {
 				serverDiv =
 			$("<div class='linha_tabela' server_ip='" + currentServer.Ip + "'>"
+			+ "<div class='server_name'></div>"
+			+ "<div class='server_info'></div>"
+			+ "</div>"
+			
+			
+			+"<div class='linha_tabela' server_ip='" + currentServer.Ip + "'>"
 			+ "<div class='server_name'></div>"
 			+ "<div class='server_info'></div>"
 			+ "</div>");
@@ -57,6 +78,7 @@ function UpdateView() {
 		}
 
 		$("#main > div.server_down").remove();
+		updateSizes();
 	}
 	catch (Exception) {
 		ShowError(Exception);

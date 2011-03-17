@@ -46,10 +46,6 @@ function updateSize(width, height) {
 			$(this).height(height - $(this).css("top").replace("px", "") - $(this).css("bottom").replace("px", ""));
 		}
 		else {
-			if ($(this).is("iframe")) {
-				var a = 1 + 1;
-			}
-
 			$(this).width($(this).parent().width() - $(this).css("left").replace("px", "") - $(this).css("right").replace("px", ""));
 			$(this).height($(this).parent().height() - $(this).css("top").replace("px", "") - $(this).css("bottom").replace("px", ""));
 		}
