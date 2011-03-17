@@ -7,7 +7,7 @@ function showFlyout(page, object) {
 	flyoutWin.object = object;
 }
 
-function updateSizes() {
+function updateSize() {
 	$("div, table").each(function () {
 		$(this).width($(this).parent().width() - $(this).css("left").replace("px", "") - $(this).css("right").replace("px", ""));
 
@@ -15,10 +15,103 @@ function updateSizes() {
 			Wrapper = Wrapper;
 		}
 
-		if (!$(this).css("top") || $(this).css("top") == "auto")
-			$(this).css("top", $(this).parent().height() - $(this).height());
+		var top = $(this).css("top");
 
-		$(this).height($(this).parent().height() - $(this).css("top").replace("px", "") - $(this).css("bottom").replace("px", ""));
+		if (!top || top == "auto")
+			top = ($(this).parent().height() - $(this).height()) + "px";
+
+		$(this).height($(this).parent().height() - top.replace("px", "") - $(this).css("bottom").replace("px", ""));
+	});
+
+	updatePageNav();
+}
+
+function updatePageNav() {
+	var prev;
+	var next;
+	if ($("#main").attr("scrollTop") <= 0) {
+		$("#page_prev").css("cursor", "default");
+		$("#page_prev").attr("src", "images/page_prev_gray.png");
+		$("#page_prev").get(0).onclick = null;
+	}
+	else {
+		prev = true;
+		$("#page_prev").css("cursor", "hand");
+		$("#page_prev").attr("src", "images/page_prev.png");
+		$("#page_prev").get(0).onclick = goToPreviousPage;
+	}
+
+	if ($("#main").attr("scrollTop") >= ($("#main").attr("scrollHeight") - $("#main").height())) {
+		$("#page_next").css("cursor", "default");
+		$("#page_next").attr("src", "images/page_next_gray.png");
+		$("#page_next").get(0).onclick = null;
+	}
+	else {
+		next = true;
+		$("#page_next").css("cursor", "hand");
+		$("#page_next").attr("src", "images/page_next.png");
+		$("#page_next").get(0).onclick = goToNextPage;
+	}
+	if (!prev && !next) {
+		$("#nav").hide();
+	}
+	else {
+		$("#nav").show();
+	}
+}
+
+function goToPreviousPage() {
+	var firstTop = $("#main > *:eq(0)").offset().top;
+
+	var nextTop = $("#main").attr("scrollTop") - $("#main").height();
+	var lastTop = $("#main").attr("scrollHeight") - $("#main").height();
+
+	var nextPageEls = $("#main > *").filter(function (i) {
+		var e = $("#main > *:eq(" + i + ")");
+		var elTop = e.offset().top - firstTop;
+		return (nextTop - e.height()) < elTop;
+	});
+
+	if (!nextPageEls.length) {
+		nextTop = 0;
+	}
+	else {
+		nextTop = nextPageEls.first().offset().top - firstTop;
+	}
+
+	$("#main").animate({ scrollTop: nextTop },
+	{
+		duration: 500,
+		complete: updatePageNav
+	});
+}
+
+function goToNextPage() {
+	var firstTop = $("#main > *:eq(0)").offset().top;
+
+	var nextTop = $("#main").attr("scrollTop") + $("#main").height();
+	var lastTop = $("#main").attr("scrollHeight") - $("#main").height();
+
+	var nextPageEls = $("#main > *").filter(function (i) {
+		var e = $("#main > *:eq(" + i + ")");
+		return (e.offset().top - firstTop) + e.height() + parseInt(e.css("margin-bottom").replace("px", "")) >= nextTop;
+	});
+
+	if (nextTop > lastTop)
+		nextTop = lastTop;
+	else {
+		if (!nextPageEls.length) {
+			nextTop = lastTop;
+		}
+		else {
+			nextTop = nextPageEls.first().offset().top - firstTop;
+		} 
+	}
+	
+	$("#main").animate({ scrollTop: nextTop },
+	{
+		duration: 500,
+		complete: updatePageNav
 	});
 }
 
@@ -35,12 +128,6 @@ function UpdateView() {
 			if (!serverDiv.length) {
 				serverDiv =
 			$("<div class='linha_tabela' server_ip='" + currentServer.Ip + "'>"
-			+ "<div class='server_name'></div>"
-			+ "<div class='server_info'></div>"
-			+ "</div>"
-			
-			
-			+"<div class='linha_tabela' server_ip='" + currentServer.Ip + "'>"
 			+ "<div class='server_name'></div>"
 			+ "<div class='server_info'></div>"
 			+ "</div>");
@@ -78,7 +165,7 @@ function UpdateView() {
 		}
 
 		$("#main > div.server_down").remove();
-		updateSizes();
+		updateSize();
 	}
 	catch (Exception) {
 		ShowError(Exception);
@@ -92,7 +179,13 @@ $(document).ready(function () {
 
 	UpdateView();
 	Wrapper.UpdateServers();
-	setInterval(function () { Wrapper.UpdateServers(); }, 10000);
+	setInterval(function () {
+		try {
+			Wrapper.UpdateServers();
+		} catch (Exception) {
+			ShowError(Exception);
+		}
+	}, 10000);
 
 	setInterval(UpdateView, 1000);
 });

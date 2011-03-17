@@ -50,6 +50,12 @@ function updateSize(width, height) {
 			$(this).height($(this).parent().height() - $(this).css("top").replace("px", "") - $(this).css("bottom").replace("px", ""));
 		}
 	});
+
+	if ($("#main iframe").length) {
+		var updateSize = $("#main iframe").get(0).contentWindow.updateSize;
+		if (updateSize)
+			updateSize();
+	}
 }
 
 //
