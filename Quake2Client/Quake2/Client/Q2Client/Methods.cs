@@ -29,7 +29,7 @@ namespace Quake2.Client
 						StuffCommand("begin " + Precache);
 					}
 				},
-				{ "cmd", s => StuffCommand(s.Substring(4)) },
+				{ "cmd", s => { lock (UserInfoLock) StuffCommand(s.Substring(4)); }},
 				{ "set", s =>
 						{
 							string[] words = s.Split(' ');
@@ -86,12 +86,9 @@ namespace Quake2.Client
 		public void StuffText(string command)
 		{
 			string subCommand = string.Empty;
-
-			string token;
-
 			do
 			{
-				token = GetNextToken(ref command);
+				string token = GetNextToken(ref command);
 
 				if (token == ";")
 				{
@@ -100,7 +97,6 @@ namespace Quake2.Client
 				}
 				else if (token != string.Empty)
 					subCommand += token + " ";
-
 			} while (command != string.Empty);
 
 			if (subCommand != string.Empty)
@@ -132,7 +128,7 @@ namespace Quake2.Client
 				if (OnExecuteMethod != null)
 					OnExecuteMethod(this, eventArgs);
 
-				if(!eventArgs.Abort)
+				if (!eventArgs.Abort)
 					ServerMethods[cmd](currentCommand);
 			}
 			else

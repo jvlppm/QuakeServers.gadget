@@ -11,6 +11,7 @@ namespace Quake2.Client
 		public VarCollection Info { get; private set; } // Data maintened by the client
 		public Dictionary<string, VarCollection> UserVars { get; private set; } // Data maintained by the user
 
+		internal object UserInfoLock = new object();
 		internal UserInfo UserInfo { get; set; } // Data exposed to the server
 		VarCollection ServerVars { get; set; } // Data set by the server
 		Dictionary<string, string> ServerAliases { get; set; } // Aliases set by the server

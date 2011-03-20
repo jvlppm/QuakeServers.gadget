@@ -193,22 +193,25 @@ namespace Quake2.Client
 			if (Status != ConnectionStatus.Connected && Status != ConnectionStatus.Disconnecting)
 				return;
 
-			if (Q2Client.UserInfoModified)
+			lock (Q2Client.UserInfoLock)
 			{
-				Send(Q2Client.UserInfo, true);
-				Q2Client.UserInfoModified = false;
-			}
-
-			do
-			{
-				WriteRawData pkt = Channel.GetNextPacket();
-
-				if (pkt != null)
+				if (Q2Client.UserInfoModified)
 				{
-					for (int i = 0; i <= (int)((Variable)Q2Client.UserVars["Net"].GetMember("PacketDup")).Value; i++)
-						UdpConnection.Send(pkt.Data.ToArray(), pkt.Data.Count);
+					Send(Q2Client.UserInfo, true);
+					Q2Client.UserInfoModified = false;
 				}
-			} while (Channel.PendingReliable && Status != ConnectionStatus.Disconnected);
+
+				do
+				{
+					WriteRawData pkt = Channel.GetNextPacket();
+
+					if (pkt != null)
+					{
+						for (int i = 0; i <= (int) ((Variable) Q2Client.UserVars["Net"].GetMember("PacketDup")).Value; i++)
+							UdpConnection.Send(pkt.Data.ToArray(), pkt.Data.Count);
+					}
+				} while (Channel.PendingReliable && Status != ConnectionStatus.Disconnected);
+			}
 		}
 
 		void SendConnectionlessString(string message, params object[] args)
