@@ -4,14 +4,21 @@ function updateView() {
 	if (updatingView)
 		return;
 	updatingView = true;
+	var lastMessage = $("#chat_text div").last();
+	var autoScroll = $("#chat_text").scrollTop() >= ($("#chat_text").attr("scrollHeight") - $("#chat_text").height()) - lastMessage.height();
+	lastMessage = lastMessage.html();
+	
 	$("#chat_text").html("");
 	var messages;
 	eval("messages = " + object.LastMessages + ";");
 	for (var i = 0; i < messages.length; i++) {
-		$("#chat_text").append("<div class='serverprint_" + messages[i].Level + "'>" + messages[i].Message + "</div>");
+		$("#chat_text").append("<div class='serverprint_" + messages[i].Level + "'>" + messages[i].Message.replace("\n", "") + "</div>");
 	}
-
-	$("#chat_text").animate({ scrollTop: $("#chat_text").attr("scrollHeight") }, 300);
+	if (messages.length > 0 && lastMessage != messages[messages.length - 1].Message.replace("\n", "")) {
+		if (autoScroll) {
+			$("#chat_text").animate({ scrollTop: $("#chat_text").attr("scrollHeight") }, 300);
+		}
+	}
 
 	if (object.UpdatingConnection) {
 		$("#start_chat").hide();

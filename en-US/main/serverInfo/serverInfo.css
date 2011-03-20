@@ -36,6 +36,7 @@ body
 
 #chat_text
 {
+	word-wrap: break-word;
 	overflow: auto;
 	height:80%;
 	margin-bottom: 4px;
