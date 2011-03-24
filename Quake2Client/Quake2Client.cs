@@ -12,7 +12,7 @@ using Timer = System.Timers.Timer;
 namespace Quake2Client
 {
 	[ComVisible(true)]
-	public class Quake2Client
+	public class Quake2Client : IDisposable
 	{
 		#region Nested Members
 		class AsyncRequest
@@ -313,6 +313,12 @@ namespace Quake2Client
 			q2.Exited += delegate { _internalPlaying = false; };
 
 			q2.Start();
+		}
+
+		public void Dispose()
+		{
+			foreach (var serverInfo in AllServers)
+				serverInfo.IsConnected = false;
 		}
 	}
 }
