@@ -12,7 +12,7 @@ function updateView() {
 	var messages;
 	eval("messages = " + object.LastMessages + ";");
 	for (var i = 0; i < messages.length; i++) {
-		$("#chat_text").append("<div class='serverprint_" + messages[i].Level + "'>" + messages[i].Message.replace("\n", "") + "</div>");
+		$("#chat_text").append("<div class='serverprint_" + messages[i].Type + "'>" + messages[i].Message.replace("\n", "") + "</div>");
 	}
 	if (messages.length > 0 && lastMessage != messages[messages.length - 1].Message.replace("\n", "")) {
 		if (autoScroll) {

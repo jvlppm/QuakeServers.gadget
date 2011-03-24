@@ -8,6 +8,12 @@ using Quake2.Network.Commands.Server;
 
 namespace Quake2Client
 {
+	class ServerMessage
+	{
+		public string Type { get; set; }
+		public string Message { get; set; }
+	}
+
 	[ComVisible(true)]
 	public class ServerInfo
 	{
@@ -26,10 +32,31 @@ namespace Quake2Client
 
 											if (_lastMessages.Count >= 10)
 												_lastMessages.Dequeue();
-											_lastMessages.Enqueue(e.Command);
+											_lastMessages.Enqueue(new ServerMessage { Type = e.Command.Level.ToString(), Message = e.Command.Message });
 			                           	};
 
-			_lastMessages = new Queue<Print>();
+			_q2Client.OnServerUnknownConnectionlessCommand += (s, e) =>
+			{
+				if (_lastMessages.Count >= 10)
+					_lastMessages.Dequeue();
+				_lastMessages.Enqueue(new ServerMessage { Type = "Unknown", Message = e.Command });
+			};
+
+			_q2Client.OnServerConnectionlessPrint += (s, e) =>
+			{
+				if (_lastMessages.Count >= 10)
+					_lastMessages.Dequeue();
+				_lastMessages.Enqueue(new ServerMessage { Type = "Print", Message = e });
+			};
+
+			/*_q2Client.OnServerStringPackage += (s, e) =>
+			{
+				if (_lastMessages.Count >= 10)
+					_lastMessages.Dequeue();
+				_lastMessages.Enqueue(new ServerMessage { Type = "String", Message = e.Command.Message });
+			};*/
+
+			_lastMessages = new Queue<ServerMessage>();
 			if (string.IsNullOrEmpty(ip))
 				throw new ArgumentException("Ip cannot be null or empty", "ip");
 			Ip = ip;
@@ -106,7 +133,7 @@ namespace Quake2Client
 
 		internal DateTime LastUpdate { get; set; }
 
-		private readonly Queue<Print> _lastMessages;
+		private readonly Queue<ServerMessage> _lastMessages;
 
 		public string LastMessages { get { return Json.Extract(_lastMessages); } }
 

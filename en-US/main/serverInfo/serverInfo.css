@@ -62,3 +62,9 @@ body
 {
 	color: #307D7E;
 }
+
+.serverprint_Unknown, .serverprint_Print
+{
+	color: Black;
+	font-weight: bold;
+}
