@@ -81,34 +81,35 @@ function LimitValue(value, min, max) {
 function updateGadget() {
 	CheckForLocalUpdates();
 	if (updater.CanUpdate || (!initialized && updater.WrapperLoaded)) {
+		setTimeout(function () {
+			if (updater.LastUpdateTime)
+				setInterval(CheckForUpdates, LimitValue(updater.LastUpdateTime, 0.05, 60) * 60 * 1000);
 
-		if (updater.LastUpdateTime)
-			setInterval(CheckForUpdates, LimitValue(updater.LastUpdateTime, 0.05, 60) * 60 * 1000);
-
-		try {
-			initialized = true;
-			var wrapper = updater.Update();
-			var newIframe = $("<iframe class='docked' scrolling='no' src='main/main.html'></iframe>");
-
-			$("#main").html("");
-			$("#main").append(newIframe);
 			try {
-				newIframe.get(0).contentWindow.Wrapper = wrapper;
-				newIframe.get(0).contentWindow.CheckForUpdates = CheckForUpdates;
-				newIframe.get(0).contentWindow.ShowError = ShowError;
-				newIframe.get(0).contentWindow.System = System;
+				initialized = true;
+				var wrapper = updater.Update();
+				var newIframe = $("<iframe class='docked' scrolling='no' src='main/main.html'></iframe>");
+
+				$("#main").html("");
+				$("#main").append(newIframe);
+				try {
+					newIframe.get(0).contentWindow.Wrapper = wrapper;
+					newIframe.get(0).contentWindow.CheckForUpdates = CheckForUpdates;
+					newIframe.get(0).contentWindow.ShowError = ShowError;
+					newIframe.get(0).contentWindow.System = System;
+				} catch (Exception) {
+					document.location = document.location;
+				}
+
+				$("#error").hide("fast");
+
+				checkDockState();
 			} catch (Exception) {
-				document.location = document.location;
+				if (Exception.message)
+					Exception = Exception.message;
+				ShowError(Exception);
 			}
-
-			$("#error").hide("fast");
-
-			checkDockState();
-		} catch (Exception) {
-			if (Exception.message)
-				Exception = Exception.message;
-			ShowError(Exception);
-		}
+		}, 3000);
 	}
 }
 
