@@ -117,6 +117,11 @@ namespace Quake2Client
 			}
 		}
 
+		public bool IsConneting
+		{
+			get { return _q2Client.ConnectionStatus == ConnectionStatus.Connecting; }
+		}
+
 		public bool UpdatingConnection
 		{
 			get

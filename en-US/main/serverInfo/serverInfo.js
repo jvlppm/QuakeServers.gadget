@@ -7,7 +7,7 @@ function updateView() {
 	var lastMessage = $("#chat_text div").last();
 	var autoScroll = $("#chat_text").scrollTop() >= ($("#chat_text").attr("scrollHeight") - $("#chat_text").height()) - lastMessage.height();
 	lastMessage = lastMessage.html();
-	
+
 	$("#chat_text").html("");
 	var messages;
 	eval("messages = " + object.LastMessages + ";");
@@ -20,27 +20,29 @@ function updateView() {
 		}
 	}
 
+	if (object.IsConneting || object.IsConnected) {
+		$("body").animate({ width: 430 }, { complete: function () {
+			$("#chat").show("fast", function () { updatingView = false; });
+		}});
+	}
+	else {
+		$("#chat").hide("fast", function () {
+			$("body").animate({ width: 220 }, { complete: function () { updatingView = false; } });
+		});
+	}
 	if (object.UpdatingConnection) {
 		$("#start_chat").hide();
 		$("#end_chat").hide();
 		$("#chat_inp").hide();
-		$("#chat").hide("fast", function () { updatingView = false; });
 	}
 	else {
 		if (object.IsConnected) {
-			$("#chat_inp").show();
-			$("body").animate({ width: 430 }, { complete: function () {
-				$("#start_chat").hide();
-				$("#end_chat").show();
-				$("#chat").show("fast", function () { updatingView = false; });
-			}});
+			$("#start_chat").hide();
+			$("#end_chat").show();
 		}
 		else {
-			$("#chat").hide("fast", function () {
-				$("#start_chat").show();
-				$("#end_chat").hide();
-				$("body").animate({ width: 220 }, { complete: function () { updatingView = false; } });
-			});
+			$("#start_chat").show();
+			$("#end_chat").hide();
 		}
 	}
 
@@ -59,7 +61,7 @@ function updateView() {
 	else {
 		$("#players").html("").show();
 		$("#server_error").html("").hide();
-		
+
 		var players;
 		eval("players = " + object.GetPlayers() + ";");
 		if (players) {
