@@ -12,11 +12,12 @@ namespace Jv.Threading
 			worker.Exit();
 		}
 
-		public static void Start<ParameterType>(ParameterType parameter, ParameterMethod<ParameterType> method)
+		public static Worker Start<ParameterType>(ParameterType parameter, ParameterMethod<ParameterType> method)
 		{
 			Worker worker = new Worker();
 			worker.Execute(parameter, method);
 			worker.Exit();
+			return worker;
 		}
 
 		public static void Start(string name, ThreadStart method)

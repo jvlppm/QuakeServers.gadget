@@ -17,6 +17,8 @@ namespace Quake2Client
 	[ComVisible(true)]
 	public class ServerInfo
 	{
+		internal bool Updating { get; set; }
+
 		public ServerInfo(string ip)
 		{
 			_q2Client = new Q2Client();

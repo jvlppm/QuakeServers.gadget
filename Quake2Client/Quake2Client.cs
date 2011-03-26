@@ -6,7 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
+using Jv.Threading;
 using Timer = System.Timers.Timer;
 
 namespace Quake2Client
@@ -79,7 +81,7 @@ namespace Quake2Client
 
 			foreach (var server in servers.Split('\n'))
 			{
-				if(string.IsNullOrEmpty(server))
+				if (string.IsNullOrEmpty(server))
 					continue;
 				if (AllServers.All(oldServer => oldServer.Ip != server))
 					MasterQ2Servers.Add(new ServerInfo(server));
@@ -109,56 +111,68 @@ namespace Quake2Client
 			}
 			else _externalPlaying = false;
 
-			foreach (var server in AllServers)
+			foreach (var s in AllServers.Where(s => !s.Updating))
 			{
-				try
+				s.Updating = true;
+				string hostname = s.Ip.Split(':')[0];
+				int port = int.Parse(s.Ip.Split(':')[1]);
+				var sock = new UdpClient(hostname, port);
+
+				var connectionInfo = new { Server = s, Socket = sock };
+
+				var timeoutChecker = Parallel.Start(connectionInfo, info =>
 				{
-					string hostname = server.Ip.Split(':')[0];
-					int port = int.Parse(server.Ip.Split(':')[1]);
+					try
+					{
+						Thread.Sleep(1000);
+						info.Socket.Close();
+					}
+					catch (ThreadAbortException) { }
+				});
 
-					var socket = new UdpClient(hostname, port);
-					socket.Send(_queryData, _queryData.Length);
-
-					socket.BeginReceive(ReceiveServerInfo, new AsyncRequest { Server = server, Socket = socket });
-				}
-				catch (Exception ex)
+				Parallel.Start(connectionInfo, info =>
 				{
-					server.LastError = ex.Message;
-				}
-			}
-		}
+					try
+					{
+						info.Socket.Send(_queryData, _queryData.Length);
+						var serverEP = new IPEndPoint(IPAddress.Any, 27910);
 
-		private static void ReceiveServerInfo(IAsyncResult ar)
-		{
-			var req = (AsyncRequest)ar.AsyncState;
-			var serverEP = new IPEndPoint(IPAddress.Any, 27910);
+						var resp = info.Socket.Receive(ref serverEP);
+						string serverStrResponse = resp.Aggregate(string.Empty, (current, c) => current + (char)c);
+						string[] serverResponse = serverStrResponse.Substring(4).Split('\n');
 
-			try
-			{
-				byte[] resp = req.Socket.EndReceive(ar, ref serverEP);
-				string serverStrResponse = resp.Aggregate(string.Empty, (current, c) => current + (char)c);
-				string[] serverResponse = serverStrResponse.Substring(4).Split('\n');
+						var serverInfo = new Dictionary<string, object>();
+						var serverKeyValues = serverResponse[1].Split('\\');
+						for (int i = 1; i < serverKeyValues.Length; i += 2)
+							serverInfo.Add(serverKeyValues[i], serverKeyValues[i + 1]);
 
-				var serverInfo = new Dictionary<string, object>();
-				var serverKeyValues = serverResponse[1].Split('\\');
-				for (int i = 1; i < serverKeyValues.Length; i += 2)
-					serverInfo.Add(serverKeyValues[i], serverKeyValues[i + 1]);
-
-				req.Server.Settings = serverInfo;
-				var players = new List<PlayerInfo>();
-				for (int i = 2; i < serverResponse.Length; i++)
-				{
-					string[] pInfo = serverResponse[i].Split(' ');
-					if (pInfo.Length >= 3)
-						players.Add(new PlayerInfo { Name = string.Join(" ", pInfo, 2, pInfo.Length - 2).Trim('\"'), Frags = pInfo[0], Ping = pInfo[1] });
-				}
-				req.Server.Players = players;
-				req.Server.LastError = null;
-				req.Server.LastUpdate = DateTime.Now;
-			}
-			catch (Exception ex)
-			{
-				req.Server.LastError = ex.Message;
+						info.Server.Settings = serverInfo;
+						var players = new List<PlayerInfo>();
+						for (int i = 2; i < serverResponse.Length; i++)
+						{
+							string[] pInfo = serverResponse[i].Split(' ');
+							if (pInfo.Length >= 3)
+								players.Add(new PlayerInfo
+								{
+									Name = string.Join(" ", pInfo, 2, pInfo.Length - 2).Trim('\"'),
+									Frags = pInfo[0],
+									Ping = pInfo[1]
+								});
+						}
+						info.Server.Players = players;
+						info.Server.LastError = null;
+						info.Server.LastUpdate = DateTime.Now;
+						timeoutChecker.Abort(new Exception("Server responded"));
+					}
+					catch (Exception ex)
+					{
+						info.Server.LastError = ex.Message;
+					}
+					finally
+					{
+						info.Server.Updating = false;
+					}
+				});
 			}
 		}
 		#endregion

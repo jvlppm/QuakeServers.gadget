@@ -185,7 +185,7 @@ $(document).ready(function () {
 		} catch (Exception) {
 			ShowError(Exception);
 		}
-	}, 10000);
+	}, 1500);
 
 	setInterval(UpdateView, 1000);
 });
