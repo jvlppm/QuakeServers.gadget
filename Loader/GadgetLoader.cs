@@ -86,23 +86,34 @@ namespace Loader
 			}
 		}
 
+		private bool _updating;
+
 		public void CheckUpdates(string gadgetPath, string dllSubPath, string className)
 		{
-			if (LocalUpdate)
+			if (_updating || LocalUpdate)
 				return;
 
 			_updateStart = DateTime.Now;
+			_updating = true;
 
 			var wrapperUpdater = new Thread((ThreadStart)delegate
 			{
-			    const string zipUrl = @"https://github.com/jvlppm/Bin/raw/master/QuakeServers.gadget";
-				string dllPath = gadgetPath  + "\\" + dllSubPath;// @"\en-US\bin\Quake2Client.dll";
+				try
+				{
+					const string zipUrl = @"https://github.com/jvlppm/Bin/raw/master/QuakeServers.gadget";
+					string dllPath = gadgetPath + "\\" + dllSubPath;// @"\en-US\bin\Quake2Client.dll";
 
-			    var newZip = WebClient.DownloadData(zipUrl);
-			    if (!InUseZip.SameAs(newZip))
-					UpdateLatestVersion(gadgetPath, newZip, dllPath, className);
+					var newZip = WebClient.DownloadData(zipUrl);
+					if (!InUseZip.SameAs(newZip))
+						UpdateLatestVersion(gadgetPath, newZip, dllPath, className);
 
-			    LastUpdateTime = DateTime.Now.Subtract(_updateStart).TotalSeconds;
+					LastUpdateTime = DateTime.Now.Subtract(_updateStart).TotalSeconds;
+				}
+				catch { }
+				finally
+				{
+					_updating = false;
+				}
 			});
 
 			wrapperUpdater.Start();
