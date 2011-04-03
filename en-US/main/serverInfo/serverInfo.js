@@ -73,8 +73,6 @@ function updateView() {
 }
 
 $(document).ready(function () {
-	object = Wrapper.GetServerInfo(object.Ip);
-
 	$("#chat_say").get(0).onclick = function () {
 		object.Say($("#chat_input").val());
 		$("#chat_input").val("");

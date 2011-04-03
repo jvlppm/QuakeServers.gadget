@@ -41,7 +41,13 @@ namespace Quake2Client
 
 		public string Servers
 		{
-			get { return Json.Extract(AllServers.Where(s => DateTime.Now.Subtract(s.LastUpdate).TotalSeconds <= 60).ToList()); }
+			get
+			{
+				return Json.Extract(
+					from s in AllServers
+					where DateTime.Now.Subtract(s.LastUpdate).TotalSeconds <= 60
+					select s.Ip);
+			}
 		}
 
 		private readonly byte[] _queryData;

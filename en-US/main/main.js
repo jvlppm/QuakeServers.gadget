@@ -11,10 +11,6 @@ function updateSize() {
 	$("div, table").each(function () {
 		$(this).width($(this).parent().width() - $(this).css("left").replace("px", "") - $(this).css("right").replace("px", ""));
 
-		if ($(this).is("table")) {
-			Wrapper = Wrapper;
-		}
-
 		var top = $(this).css("top");
 
 		if (!top || top == "auto")
@@ -117,35 +113,42 @@ function goToNextPage() {
 
 function UpdateView() {
 	try {
+		var doUpdateSize = false;
 		$("#main > div").addClass("server_down");
 
 		var servers = eval(Wrapper.Servers);
 		for (var i = 0; i < servers.length; i++) {
-			var currentServer = servers[i];
+			var currentServer = Wrapper.GetServerInfo(servers[i]);
 
 			var serverDiv = $("#main > div[server_ip='" + currentServer.Ip + "']");
 
 			if (!serverDiv.length) {
-				serverDiv =
-			$("<div class='linha_tabela' server_ip='" + currentServer.Ip + "'>"
-			+ "<div class='server_name'></div>"
-			+ "<div class='server_info'></div>"
-			+ "</div>");
+				serverDiv = $(
+					"<div class='linha_tabela' server_ip='" + currentServer.Ip + "'>" +
+					"	<div class='server_name'></div>" +
+					"	<div class='server_info'></div>" +
+					"</div>");
 
 				if (i % 2)
 					serverDiv.addClass("zebra_off");
 				else
 					serverDiv.addClass("zebra_on");
 
+				serverDiv.get(0).object = currentServer;
+
 				$("#main").append(serverDiv);
+				doUpdateSize = true;
 				serverDiv.get(0).onclick = function () {
 					showFlyout("main/serverInfo/serverInfo.html", this.object);
 				};
 			} else {
 				serverDiv.removeClass("server_down");
 			}
-			serverDiv.get(0).object = currentServer;
-			serverDiv.find(" > .server_name").html(currentServer.Name);
+
+			if (serverDiv.find(" > .server_name").html() != currentServer.Name) {
+				doUpdateSize = true;
+				serverDiv.find(" > .server_name").html(currentServer.Name);
+			}
 			serverDiv.find(" > .server_info").html(currentServer.NumberOfPlayers + " players");
 			if (currentServer.LastError)
 				serverDiv.addClass("server_error");
@@ -165,7 +168,8 @@ function UpdateView() {
 		}
 
 		$("#main > div.server_down").remove();
-		updateSize();
+		if(doUpdateSize)
+			updateSize();
 	}
 	catch (Exception) {
 		ShowError(Exception);
