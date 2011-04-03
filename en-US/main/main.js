@@ -113,10 +113,21 @@ function goToNextPage() {
 
 function UpdateView() {
 	try {
+		var isPlaying = Wrapper.IsPlaying;
+		var gamePath = Wrapper.GamePath;
+		var autoLaunch = Wrapper.AutoLaunch;
+		var autoPlay = !isPlaying && gamePath && autoLaunch;
+		delete autoLaunch;
+		delete isPlaying;
+		delete gamePath;
+
 		var doUpdateSize = false;
 		$("#main > div").addClass("server_down");
 
-		var servers = eval(Wrapper.Servers);
+		var serversStr = Wrapper.Servers;
+		var servers = eval(serversStr);
+		delete serversStr;
+
 		for (var i = 0; i < servers.length; i++) {
 			var currentServer = Wrapper.GetServerInfo(servers[i]);
 
@@ -158,14 +169,20 @@ function UpdateView() {
 				serverDiv.addClass("has_players");
 			else serverDiv.removeClass("has_players");
 
-			if (!Wrapper.IsPlaying && Wrapper.GamePath && Wrapper.AutoLaunch) {
-				if (currentServer.NumberOfPlayers >= Wrapper.AutoLaunchMinPlayers) {
+			if (autoPlay) {
+				var numberOfPlayers = currentServer.NumberOfPlayers;
+				var minPlayers = Wrapper.AutoLaunchMinPlayers;
+				if (numberOfPlayers >= minPlayers) {
 					if (Wrapper.MinutesSinceLastPlay >= Wrapper.AutoLaunchMinTime) {
 						Wrapper.LaunchGame(currentServer.Ip);
 					}
 				}
+				delete numberOfPlayers;
+				delete minPlayers;
 			}
 		}
+
+		delete servers;
 
 		$("#main > div.server_down").remove();
 		if(doUpdateSize)
@@ -191,5 +208,5 @@ $(document).ready(function () {
 		}
 	}, 1500);
 
-	setInterval(UpdateView, 1000);
+	setInterval(UpdateView, 100);
 });

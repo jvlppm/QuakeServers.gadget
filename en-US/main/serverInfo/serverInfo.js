@@ -37,10 +37,12 @@ function updateView() {
 	}
 	else {
 		if (object.IsConnected) {
+			$("#chat_inp").show();
 			$("#start_chat").hide();
 			$("#end_chat").show();
 		}
 		else {
+			$("#chat_inp").hide();
 			$("#start_chat").show();
 			$("#end_chat").hide();
 		}
