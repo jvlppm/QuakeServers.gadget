@@ -145,7 +145,13 @@ namespace Quake2Client
 		public string LastMessages { get { return Json.Extract(_lastMessages); } }
 
 		public List<PlayerInfo> Players { get; set; }
-		public int NumberOfPlayers { get { return Players == null ? 0 : Players.Where(p => p.Name != "WindowsGadget").Count(); } }
+
+		public static List<string> IgnorePlayers = new List<string>
+		                                           	{
+														"WindowsGadget",
+														"Kaeru"
+		                                           	};
+		public int NumberOfPlayers { get { return Players == null ? 0 : Players.Where(p => !IgnorePlayers.Exists(i => i.ToLower() == p.Name.ToLower())).Count(); } }
 
 		public Dictionary<string, object> Settings { get; set; }
 
