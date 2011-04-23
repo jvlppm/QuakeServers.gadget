@@ -19,7 +19,7 @@ namespace Quake2.Client
 
 		void SetupConnection()
 		{
-			OnServerStuffText += (s, e) => StuffText(e.Command.Message);
+			OnServerStuffText += (s, e) => { lock(UserInfoLock) StuffText(e.Command.Message); };
 		}
 
 		public void Disconnect()

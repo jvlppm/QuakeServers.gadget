@@ -29,7 +29,7 @@ namespace Quake2.Client
 						StuffCommand("begin " + Precache);
 					}
 				},
-				{ "cmd", s => { lock (UserInfoLock) StuffCommand(s.Substring(4)); }},
+				{ "cmd", s => { StuffCommand(s.Substring(4)); }},
 				{ "set", s =>
 						{
 							string[] words = s.Split(' ');
